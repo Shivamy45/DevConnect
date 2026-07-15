@@ -16,6 +16,8 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 
 # 2. API Conventions
 
+> **Identifier Convention:** All route parameters named `:publicId` refer to nanoid-generated public identifiers. MongoDB ObjectIds are never exposed through the public API.
+
 | Item           | Standard         |
 | -------------- | ---------------- |
 | Protocol       | HTTPS            |
@@ -46,6 +48,17 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 | ------------- | -------------------------------------- | ------------------------------------------------------------ |
 | Access Token  | `Authorization: Bearer <token>` header | Authenticate protected API requests                          |
 | Refresh Token | HTTP-only Cookie                       | Obtain new access tokens and manage multiple active sessions |
+
+**Token Lifetime**
+
+- Access Token: 15 minutes
+- Refresh Token: 30 days
+
+**Cookie Configuration**
+
+- HttpOnly
+- Secure (production)
+- SameSite=Lax
 
 ### Standard Response
 
@@ -94,6 +107,7 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 | Messages       | Send and receive messages                  |
 | Reviews        | Submit and view reviews                    |
 | Notifications  | User notifications                         |
+| Sessions       | Manage active login sessions               |
 
 ---
 
@@ -111,71 +125,74 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 
 ## Users
 
-| Method | Endpoint     | Auth | Description      | Notes              |
-| ------ | ------------ | ---- | ---------------- | ------------------ |
-| GET    | `/users/:id` | No   | Get user profile | Public endpoint    |
-| PATCH  | `/users/:id` | Yes  | Update profile   | Owner only         |
-| GET    | `/users`     | No   | Search users     | Paginated response |
+| Method | Endpoint             | Auth | Description                 | Notes              |
+| ------ | -------------------- | ---- | --------------------------- | ------------------ |
+| GET    | `/users/:publicId`   | No   | Get user profile            | Public endpoint    |
+| PATCH  | `/users/me`          | Yes  | Update profile              | Owner only         |
+| GET    | `/users/me/projects` | Yes  | Get current user's projects | Authenticated user |
+| GET    | `/users`             | No   | Search users                | Paginated response |
 
 ## Projects
 
-| Method | Endpoint                        | Auth | Description                | Notes                     |
-| ------ | ------------------------------- | ---- | -------------------------- | ------------------------- |
-| POST   | `/projects`                     | Yes  | Create project             | Authenticated user        |
-| GET    | `/projects`                     | No   | List projects              | Returns paginated results |
-| GET    | `/projects/:id`                 | No   | Get project                | Public endpoint           |
-| PATCH  | `/projects/:id`                 | Yes  | Update project             | Owner only                |
-| DELETE | `/projects/:id`                 | Yes  | Delete project             | Owner only                |
-| GET    | `/projects/:id/members`         | No   | List project members       | Public project only       |
-| DELETE | `/projects/:id/members/:userId` | Yes  | Remove member from project | Owner only                |
+| Method | Endpoint                                           | Auth | Description                | Notes                                                           |
+| ------ | -------------------------------------------------- | ---- | -------------------------- | --------------------------------------------------------------- |
+| POST   | `/projects`                                        | Yes  | Create project             | Authenticated user                                              |
+| GET    | `/projects`                                        | No   | List projects              | Supports pagination, search, status, visibility and tag filters |
+| GET    | `/projects/:publicId`                              | No   | Get project                | Public endpoint                                                 |
+| PATCH  | `/projects/:publicId`                              | Yes  | Update project             | Owner only                                                      |
+| DELETE | `/projects/:publicId`                              | Yes  | Delete project             | Owner only                                                      |
+| GET    | `/projects/:publicId/members`                      | No   | List project members       | Public project only                                             |
+| DELETE | `/projects/:projectPublicId/members/:userPublicId` | Yes  | Remove member from project | Owner only                                                      |
 
-## Collaboration Requests & Members
+## Collaboration
 
-| Method | Endpoint                 | Auth | Description                | Notes                           |
-| ------ | ------------------------ | ---- | -------------------------- | ------------------------------- |
-| POST   | `/projects/:id/requests` | Yes  | Send collaboration request | Authenticated user              |
-| PATCH  | `/requests/:id/accept`   | Yes  | Accept request             | Project owner only              |
-| PATCH  | `/requests/:id/reject`   | Yes  | Reject request             | Project owner only              |
-| DELETE | `/requests/:id`          | Yes  | Cancel or remove request   | Request sender or project owner |
+| Method | Endpoint                       | Auth | Description                    | Notes                           |
+| ------ | ------------------------------ | ---- | ------------------------------ | ------------------------------- |
+| POST   | `/projects/:publicId/requests` | Yes  | Send collaboration request     | Authenticated user              |
+| GET    | `/projects/:publicId/requests` | Yes  | List collaboration requests    | Project owner only              |
+| GET    | `/users/me/requests`           | Yes  | List my collaboration requests | Authenticated user              |
+| PATCH  | `/requests/:publicId/accept`   | Yes  | Accept request                 | Project owner only              |
+| PATCH  | `/requests/:publicId/reject`   | Yes  | Reject request                 | Project owner only              |
+| DELETE | `/requests/:publicId`          | Yes  | Cancel or remove request       | Request sender or project owner |
 
 ## Conversations
 
-| Method | Endpoint             | Auth | Description         | Notes                     |
-| ------ | -------------------- | ---- | ------------------- | ------------------------- |
-| GET    | `/conversations`     | Yes  | List conversations  | Returns paginated results |
-| POST   | `/conversations`     | Yes  | Create conversation | Project members only      |
-| GET    | `/conversations/:id` | Yes  | Get conversation    | Project members only      |
+| Method | Endpoint                   | Auth | Description         | Notes                     |
+| ------ | -------------------------- | ---- | ------------------- | ------------------------- |
+| GET    | `/conversations`           | Yes  | List conversations  | Returns paginated results |
+| POST   | `/conversations`           | Yes  | Create conversation | Project members only      |
+| GET    | `/conversations/:publicId` | Yes  | Get conversation    | Project members only      |
 
 ## Messages
 
-| Method | Endpoint                      | Auth | Description   | Notes                     |
-| ------ | ----------------------------- | ---- | ------------- | ------------------------- |
-| GET    | `/conversations/:id/messages` | Yes  | List messages | Returns paginated results |
-| POST   | `/conversations/:id/messages` | Yes  | Send message  | Project members only      |
+| Method | Endpoint                            | Auth | Description   | Notes                     |
+| ------ | ----------------------------------- | ---- | ------------- | ------------------------- |
+| GET    | `/conversations/:publicId/messages` | Yes  | List messages | Returns paginated results |
+| POST   | `/conversations/:publicId/messages` | Yes  | Send message  | Project members only      |
 
 ## Reviews
 
-| Method | Endpoint             | Auth | Description      | Notes              |
-| ------ | -------------------- | ---- | ---------------- | ------------------ |
-| POST   | `/reviews`           | Yes  | Create review    | Collaborators only |
-| GET    | `/users/:id/reviews` | No   | Get user reviews | Public endpoint    |
+| Method | Endpoint                   | Auth | Description      | Notes              |
+| ------ | -------------------------- | ---- | ---------------- | ------------------ |
+| POST   | `/reviews`                 | Yes  | Create review    | Collaborators only |
+| GET    | `/users/:publicId/reviews` | No   | Get user reviews | Public endpoint    |
 
 ## Notifications
 
-| Method | Endpoint                  | Auth | Description                    | Notes                     |
-| ------ | ------------------------- | ---- | ------------------------------ | ------------------------- |
-| GET    | `/notifications`          | Yes  | List notifications             | Returns paginated results |
-| PATCH  | `/notifications/:id/read` | Yes  | Mark notification as read      | Authenticated user        |
-| PATCH  | `/notifications/read-all` | Yes  | Mark all notifications as read | Authenticated user        |
+| Method | Endpoint                        | Auth | Description                    | Notes                     |
+| ------ | ------------------------------- | ---- | ------------------------------ | ------------------------- |
+| GET    | `/notifications`                | Yes  | List notifications             | Returns paginated results |
+| PATCH  | `/notifications/:publicId/read` | Yes  | Mark notification as read      | Authenticated user        |
+| PATCH  | `/notifications/read-all`       | Yes  | Mark all notifications as read | Authenticated user        |
 
 ## Sessions
 
-| Method | Endpoint            | Auth | Description             | Notes                      |
-| ------ | ------------------- | ---- | ----------------------- | -------------------------- |
-| GET    | `/sessions`         | Yes  | List active sessions    | Current authenticated user |
-| DELETE | `/sessions/:id`     | Yes  | Remove a device session | Current authenticated user |
-| DELETE | `/sessions/current` | Yes  | Logout current device   | Current authenticated user |
-| DELETE | `/sessions`         | Yes  | Logout all devices      | Current authenticated user |
+| Method | Endpoint              | Auth | Description             | Notes                      |
+| ------ | --------------------- | ---- | ----------------------- | -------------------------- |
+| GET    | `/sessions`           | Yes  | List active sessions    | Current authenticated user |
+| DELETE | `/sessions/:publicId` | Yes  | Remove a device session | Current authenticated user |
+| DELETE | `/sessions/current`   | Yes  | Logout current device   | Current authenticated user |
+| DELETE | `/sessions`           | Yes  | Logout all devices      | Current authenticated user |
 
 ---
 
@@ -201,7 +218,22 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 - `limit`: Number of results per page
 - `sort`: Sort order (e.g., `createdAt:desc`, `title:asc`, `rating:desc`)
 - `search`: Search string (where applicable)
-- `fields` : username
+- `fields`: Comma-separated fields to include in the response (where supported)
+
+### Common Resource Filters
+
+**Users**
+
+- username
+- skills
+
+**Projects**
+
+- status
+- visibility
+- tags
+- owner
+- requiredSkills
 
 ---
 
@@ -246,6 +278,15 @@ New Access Token
 | 422  | Validation failed     |
 | 500  | Internal server error |
 
+### Standard Error Types
+
+- VALIDATION_ERROR
+- UNAUTHORIZED
+- FORBIDDEN
+- NOT_FOUND
+- CONFLICT
+- INTERNAL_SERVER_ERROR
+
 ---
 
 # 9. Versioning
@@ -260,7 +301,7 @@ New Access Token
 - Use lowercase letters and hyphens to separate words in endpoint paths (e.g., `/user-profiles`).
 - Use plural nouns for resource names (e.g., `/users`, `/projects`).
 - Use HTTP methods to represent actions (e.g., `GET` for retrieval, `POST` for creation).
-- Use nested routes to represent resource relationships (e.g., `/projects/:id/members`).
+- Use nested routes to represent resource relationships (e.g., `/projects/:publicId/members`).
 
 ---
 

@@ -77,16 +77,19 @@ Conversation
 
 ### Sessions
 
-| Field                | Type     | Notes            |
-| -------------------- | -------- | ---------------- |
-| user                 | ObjectId | Ref, Required    |
-| Hashed Refresh Token | String   | Hashed, Required |
-| device               | String   | Optional         |
-| ipAddress            | String   | Optional         |
-| userAgent            | String   | Optional         |
-| expiresAt            | Date     | Required         |
-| createdAt            | Date     | Auto             |
-| updatedAt            | Date     | Auto             |
+| Field              | Type     | Notes            |
+| ------------------ | -------- | ---------------- |
+| publicId           | String   | Unique, Required |
+| user               | ObjectId | Ref, Required    |
+| hashedRefreshToken | String   | Hashed, Required |
+| device             | String   | Optional         |
+| ipAddress          | String   | Optional         |
+| userAgent          | String   | Optional         |
+| expiresAt          | Date     | Required         |
+| lastUsedAt         | Date     | Auto             |
+| revokedAt          | Date     | Optional         |
+| createdAt          | Date     | Auto             |
+| updatedAt          | Date     | Auto             |
 
 ### Skills
 
@@ -97,21 +100,28 @@ Conversation
 
 ### Projects
 
-| Field          | Type       | Notes           |
-| -------------- | ---------- | --------------- |
-| owner          | ObjectId   | Ref, Required   |
-| title          | String     | Required        |
-| description    | String     | Required        |
-| requiredSkills | ObjectId[] | Ref[], Optional |
-| status         | String     | Enum, Required  |
+| Field          | Type       | Notes            |
+| -------------- | ---------- | ---------------- |
+| publicId       | String     | Unique, Required |
+| owner          | ObjectId   | Ref, Required    |
+| title          | String     | Required         |
+| description    | String     | Required         |
+| requiredSkills | ObjectId[] | Ref[], Optional  |
+| maxMembers     | Number     | Required         |
+| visibility     | String     | Enum, Required   |
+| tags           | String[]   | Optional         |
+| status         | String     | Enum, Required   |
+| createdAt      | Date       | Auto             |
+| updatedAt      | Date       | Auto             |
 
 ### Collaboration Requests
 
-| Field   | Type     | Notes          |
-| ------- | -------- | -------------- |
-| sender  | ObjectId | Ref, Required  |
-| project | ObjectId | Ref, Required  |
-| status  | String   | Enum, Required |
+| Field    | Type     | Notes            |
+| -------- | -------- | ---------------- |
+| publicId | String   | Unique, Required |
+| sender   | ObjectId | Ref, Required    |
+| project  | ObjectId | Ref, Required    |
+| status   | String   | Enum, Required   |
 
 ### Collaborations
 
@@ -123,10 +133,11 @@ Conversation
 
 ### Conversations
 
-| Field        | Type                | Notes           |
-| ------------ | ------------------- | --------------- |
-| participants | ObjectId[]          | Ref[], Required |
-| project      | ObjectId (optional) | Ref, Optional   |
+| Field        | Type                | Notes            |
+| ------------ | ------------------- | ---------------- |
+| publicId     | String              | Unique, Required |
+| participants | ObjectId[]          | Ref[], Required  |
+| project      | ObjectId (optional) | Ref, Optional    |
 
 ### Messages
 
@@ -135,22 +146,32 @@ Conversation
 | conversation | ObjectId | Ref, Required |
 | sender       | ObjectId | Ref, Required |
 | content      | String   | Required      |
+| createdAt    | Date     | Auto          |
 
 ### Reviews
 
-| Field    | Type     | Notes         |
-| -------- | -------- | ------------- |
-| reviewer | ObjectId | Ref, Required |
-| reviewee | ObjectId | Ref, Required |
-| rating   | Number   | Required      |
+| Field     | Type     | Notes         |
+| --------- | -------- | ------------- |
+| reviewer  | ObjectId | Ref, Required |
+| reviewee  | ObjectId | Ref, Required |
+| project   | ObjectId | Ref, Required |
+| rating    | Number   | Required      |
+| comment   | String   | Optional      |
+| createdAt | Date     | Auto          |
 
 ### Notifications
 
-| Field     | Type     | Notes          |
-| --------- | -------- | -------------- |
-| recipient | ObjectId | Ref, Required  |
-| type      | String   | Enum, Required |
-| isRead    | Boolean  | Required       |
+| Field     | Type     | Notes            |
+| --------- | -------- | ---------------- |
+| publicId  | String   | Unique, Required |
+| recipient | ObjectId | Ref, Required    |
+| actor     | ObjectId | Ref, Optional    |
+| type      | String   | Enum, Required   |
+| title     | String   | Required         |
+| message   | String   | Required         |
+| link      | String   | Optional         |
+| isRead    | Boolean  | Default: false   |
+| createdAt | Date     | Auto             |
 
 ---
 
@@ -161,10 +182,12 @@ Conversation
 | Users                  | username, email, publicId                       |
 | Skills                 | name                                            |
 | Projects               | owner, status, title (text), description (text) |
-| Collaboration Requests | project, sender, status                         |
+| Collaboration Requests | project, sender (unique while pending), status  |
+| Collaborations         | project + user (unique), user                   |
 | Conversations          | participants                                    |
-| Notifications          | recipient, isRead                               |
+| Notifications          | recipient, isRead, createdAt                    |
 | Sessions               | user, expiresAt                                 |
+| Reviews                | reviewer + reviewee + project (unique)          |
 
 ---
 
@@ -182,11 +205,12 @@ Text indexes are used for project titles and descriptions to support keyword sea
 
 # 7. Design Principles
 
-- Every collection uses MongoDB ObjectIds.
-- Public identifiers are exposed instead of internal IDs where appropriate.
+- Every collection uses MongoDB ObjectIds internally for relationships.
+- User-facing resources expose nanoid-generated publicIds instead of MongoDB ObjectIds.
 - References are preferred over deeply nested documents.
 - Automatic timestamps are enabled on all major collections.
 - Indexes are added for commonly queried fields.
+- Compound unique indexes are used where duplicate relationships must be prevented.
 - Refresh tokens are stored as hashed values in the Sessions collection to support multiple active devices.
 
 ---
@@ -194,6 +218,7 @@ Text indexes are used for project titles and descriptions to support keyword sea
 # 8. Enumerations
 
 - **Project.status**: Draft, Open, In Progress, Completed, Archived
+- **Project.visibility**: Public, Private
 - **CollaborationRequest.status**: Pending, Accepted, Rejected, Withdrawn
 - **Collaboration.role**: Owner, Maintainer, Contributor
 - **Notification.type**: CollaborationRequest, RequestAccepted, RequestRejected, Message, Review

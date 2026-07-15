@@ -59,22 +59,40 @@ Create a platform where developers can easily turn ideas into collaborative proj
 
 ## Feature Status
 
-| Feature                | Status |
-| ---------------------- | ------ |
-| Authentication         | MVP    |
-| User Profiles          | MVP    |
-| Projects               | MVP    |
-| Collaboration Requests | MVP    |
-| Messaging              | MVP    |
-| Reviews                | MVP    |
-| Notifications          | MVP    |
-| Search & Filtering     | MVP    |
-| GitHub Integration     | Future |
-| AI Recommendations     | Future |
+| Feature                    | Status |
+| -------------------------- | ------ |
+| Authentication             | MVP    |
+| User Profiles              | MVP    |
+| Projects                   | MVP    |
+| Collaboration Requests     | MVP    |
+| Messaging                  | MVP    |
+| Reviews                    | MVP    |
+| Notifications              | MVP    |
+| Project Search & Filtering | MVP    |
+| GitHub Integration         | Future |
+| AI Recommendations         | Future |
 
 ---
 
 # 6. User Flow
+
+### Project Lifecycle
+
+```text
+Draft
+  │
+  ▼
+Open
+  │
+  ▼
+In Progress
+  │
+  ▼
+Completed
+  │
+  ▼
+Archived
+```
 
 ```text
 Guest
@@ -126,6 +144,7 @@ Browse Projects
 - Reviews
 - Notifications
 - Search and filtering
+- Public and private projects
 
 ### Planned for Future
 
@@ -134,6 +153,7 @@ Browse Projects
 - Team workspaces
 - Project milestones
 - AI-powered recommendations
+- GitHub repository linking
 
 ---
 
@@ -146,4 +166,19 @@ The project is considered successful when users can:
 - Create and discover projects.
 - Join projects through collaboration requests.
 - Communicate with collaborators.
-- Complete collaborations and exchange reviews.
+- Complete collaborations.
+- Exchange reviews after project completion.
+- Discover relevant developers and projects using search and filtering.
+
+---
+
+# 10. MVP Constraints
+
+To keep the first release focused, the MVP intentionally excludes:
+
+- Real-time messaging (messages require refresh)
+- GitHub integration
+- File sharing
+- Team workspaces
+- AI-powered recommendations
+- Project milestones and task management

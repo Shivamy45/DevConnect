@@ -15,6 +15,20 @@ DevConnect helps developers connect through shared interests, complementary skil
 
 ---
 
+## Architecture
+
+```text
+React (Vite)
+      │
+      ▼
+Express.js REST API
+      │
+      ▼
+MongoDB
+```
+
+---
+
 ## Features
 
 - User authentication
@@ -36,6 +50,7 @@ DevConnect helps developers connect through shared interests, complementary skil
 | Backend        | Node.js, Express.js       |
 | Database       | MongoDB, Mongoose         |
 | Authentication | JWT, HTTP-only Cookies    |
+| API Style      | REST                      |
 
 ---
 
@@ -51,11 +66,12 @@ docs/       # Project documentation
 
 ## Documentation
 
-| Document                  | Purpose                             |
-| ------------------------- | ----------------------------------- |
-| `01_PRODUCT.md`           | Product vision, scope, and features |
-| `02_API_SPECIFICATION.md` | REST API reference                  |
-| `03_DATABASE_DESIGN.md`   | Database schema and relationships   |
+| Document                     | Purpose                                       |
+| ---------------------------- | --------------------------------------------- |
+| `01_PRODUCT.md`              | Product vision, scope, and features           |
+| `02_API_SPECIFICATION.md`    | REST API reference                            |
+| `03_DATABASE_DESIGN.md`      | Database schema and relationships             |
+| `DEV_PROJECT_MASTER_PLAN.md` | Development roadmap and implementation phases |
 
 ---
 
@@ -64,6 +80,13 @@ docs/       # Project documentation
 ```bash
 git clone <repository-url>
 cd DevConnect
+
+# Backend
+cd server
+npm install
+
+# Frontend
+cd ../client
 npm install
 ```
 
@@ -72,6 +95,15 @@ Then:
 1. Configure the required environment variables.
 2. Start the backend server.
 3. Start the frontend development server.
+
+### Environment Variables
+
+Create a `.env` file inside the `server` directory and configure:
+
+- MONGODB_URI
+- JWT_SECRET
+- JWT_REFRESH_SECRET
+- CLIENT_URL
 
 ---
 
@@ -89,10 +121,29 @@ Current focus:
 
 ## Roadmap
 
+### MVP
+
+- Authentication
+- Developer profiles
+- Project management
+- Collaboration requests
+- Messaging
+- Reviews
+- Notifications
+- Search and filtering
+
+### Future
+
 - Real-time messaging
 - GitHub integration
 - Team workspaces
 - AI-powered recommendations
+
+---
+
+## Project Status
+
+This project is currently in MVP development. The backend architecture, API specification, and database design are finalized before implementation to ensure a consistent development process.
 
 ---
 

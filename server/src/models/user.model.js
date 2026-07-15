@@ -6,13 +6,7 @@ const userSchema = mongoose.Schema(
 			type: String,
 			required: true,
 			unique: true,
-		},
-		username: {
-			type: String,
-			required: true,
-			unique: true,
-			trim: true,
-			lowercase: true,
+			index: true,
 		},
 		email: {
 			type: String,
@@ -26,25 +20,68 @@ const userSchema = mongoose.Schema(
 			required: true,
 			select: false,
 		},
-		bio: {
+		username: {
+			type: String,
+			unique: true,
+			trim: true,
+			lowercase: true,
+			minlength: 3,
+			maxlength: 30,
+		},
+		name: {
 			type: String,
 			trim: true,
-			maxlength: 200,
-		},
-		githubUrl: {
-			type: String,
-			trim: true,
-		},
-		location: {
-			type: String,
-		},
-		availability: {
-			type: String,
 			required: true,
-			enum: ["Available", "Busy", "Not Looking"],
+			minlength: 3,
+			maxlength: 50,
 		},
 		profilePicture: {
 			type: String,
+			default: "",
+		},
+		bio: {
+			type: String,
+			trim: true,
+			default: "",
+			maxlength: 300,
+		},
+		socials: {
+			github: {
+				type: String,
+				default: "",
+			},
+			linkedin: {
+				type: String,
+				default: "",
+			},
+			portfolio: {
+				type: String,
+				default: "",
+			},
+		},
+		education: {
+			college: {
+				type: String,
+				trim: true,
+			},
+			branch: {
+				type: String,
+				trim: true,
+			},
+			year: {
+				type: Number,
+			},
+		},
+		developerType: {
+			type: String,
+			enum: ["Student", "Professional", "Freelancer", "Self-Taught"],
+		},
+		isVerified: {
+			type: Boolean,
+			default: false,
+		},
+		lastUsernameChange: {
+			type: Date,
 		},
 	},
 	{ timestamps: true },
