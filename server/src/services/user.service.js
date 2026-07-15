@@ -70,3 +70,33 @@ export const getUserProfile = async (username) => {
 		};
 	}
 };
+
+export const updateProfile = async (publicId, newData) => {
+	try {
+		const user = await userModel.findOneAndUpdate(
+			{ publicId },
+			{ $set: newData },
+			{ new: true, runValidators: true },
+		);
+
+		if (!user) {
+			return {
+				status: 404,
+				message: "User not found",
+				user: null,
+			};
+		}
+		return {
+			status: 200,
+			message: "User profile updated",
+			user,
+		};
+	} catch (error) {
+		console.log(error.name);
+		return {
+			status: 500,
+			message: "Internal Server Error",
+			user: null,
+		};
+	}
+};
