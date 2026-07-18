@@ -80,8 +80,9 @@ const userSchema = mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-		lastUsernameChange: {
+		usernameLastChangedAt: {
 			type: Date,
+			default: null,
 		},
 	},
 	{ timestamps: true },

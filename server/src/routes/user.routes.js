@@ -22,4 +22,11 @@ router.patch(
 
 router.get("/:username", getUserProfileController);
 
+router.patch(
+	"/username",
+	authenticateUser,
+	updateUsernameSchema,
+	updateUsernameController,
+);
+
 export default router;

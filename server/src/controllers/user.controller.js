@@ -2,6 +2,7 @@ import {
 	getProfile,
 	getUserProfile,
 	updateProfile,
+	updateUsername,
 } from "../services/user.service.js";
 
 export const getProfileController = async (req, res, next) => {
@@ -25,6 +26,14 @@ export const getUserProfileController = async (req, res, next) => {
 
 export const updateProfileController = async (req, res, next) => {
 	const result = await updateProfile(req.user.publicId, req.body);
+	res.status(result.status).json({
+		message: result.message,
+		user: result.user,
+	});
+};
+
+export const updateUsernameController = async (req, res, next) => {
+	const result = await updateUsername(req.user.publicId, req.body.username);
 	res.status(result.status).json({
 		message: result.message,
 		user: result.user,
