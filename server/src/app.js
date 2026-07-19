@@ -6,6 +6,7 @@ app.use(cookieParser());
 import indexRoutes from "./routes/index.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import connectionRoutes from "./routes/connection.routes.js";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -13,5 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", indexRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/connections", connectionRoutes);
 
 export default app;

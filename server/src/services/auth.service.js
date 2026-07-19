@@ -37,12 +37,10 @@ export const signupUser = async (userDetails) => {
 	while (uniqueUsername) {
 		username = baseUsername + nanoid(5);
 		uniqueUsername = await userModel.findOne({ username });
-    }
-    
-	const publicId = nanoid(12);
+	}
 
 	const user = await userModel.create({
-		publicId,
+		publicId: nanoid(12),
 		username,
 		email,
 		password: hashPass,

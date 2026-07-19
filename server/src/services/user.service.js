@@ -16,7 +16,7 @@ export const getProfile = async (username) => {
 			user,
 		};
 	} catch (error) {
-		console.log(error.name);
+		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -62,7 +62,7 @@ export const getUserProfile = async (username) => {
 			user: publicUser,
 		};
 	} catch (error) {
-		console.log(error.name);
+		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -92,7 +92,7 @@ export const updateProfile = async (publicId, newData) => {
 			user,
 		};
 	} catch (error) {
-		console.log(error.name);
+		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -151,7 +151,7 @@ export const updateUsername = async (publicId, newUsername) => {
 			},
 		};
 	} catch (error) {
-		console.log(error.name);
+		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",

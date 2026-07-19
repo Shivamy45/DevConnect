@@ -20,10 +20,14 @@ const authenticateUser = async (req, res, next) => {
 				message: "Unauthorized",
 			});
 		}
-		req.user = user;
+		req.user = {
+			id: user._id,
+			publicId: user.publicId,
+			username: user.username,
+		};
 		next();
 	} catch (error) {
-		console.log(error.name);
+		console.error(error);
 		return res.status(401).json({
 			success: false,
 			message: "Unauthorized",
