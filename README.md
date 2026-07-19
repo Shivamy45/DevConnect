@@ -11,7 +11,7 @@
 
 ## Overview
 
-DevConnect helps developers connect through shared interests, complementary skills, and project collaboration. It is designed to make finding teammates and building practical experience simpler than relying on scattered communities.
+DevConnect is a developer collaboration platform where developers can discover projects, build professional connections, find collaborators, communicate with teammates, and gain real-world development experience. It combines developer networking with project-based collaboration in a single platform.
 
 ---
 
@@ -33,8 +33,10 @@ MongoDB
 
 - User authentication
 - Developer profiles
+- Developer connections
 - Project creation and discovery
 - Collaboration requests
+- Project member management
 - Direct messaging
 - Reviews and reputation
 - Notifications
@@ -125,8 +127,10 @@ Current focus:
 
 - Authentication
 - Developer profiles
+- Developer connections
 - Project management
 - Collaboration requests
+- Project member management
 - Messaging
 - Reviews
 - Notifications
@@ -143,7 +147,7 @@ Current focus:
 
 ## Project Status
 
-This project is currently in MVP development. The backend architecture, API specification, and database design are finalized before implementation to ensure a consistent development process.
+This project is currently in MVP development following a backend-first approach. Product requirements, API specifications, and database design are defined before implementation to ensure consistent architecture and production-quality engineering.
 
 ---
 

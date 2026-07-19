@@ -10,7 +10,7 @@
 
 # 1. Overview
 
-The DevConnect backend exposes a REST API that enables user authentication, profile management, project collaboration, messaging, reviews, and notifications. All endpoints exchange JSON data over HTTPS.
+The DevConnect backend exposes a REST API that enables user authentication, developer networking, profile management, project management, collaboration, messaging, reviews, notifications, and session management. All endpoints exchange JSON data over HTTPS.
 
 ---
 
@@ -101,6 +101,7 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 | -------------- | ------------------------------------------ |
 | Authentication | Register, login, logout, refresh token     |
 | Users          | Profile, skills, account management        |
+| Connections    | Developer connection requests and professional network |
 | Projects       | Create, update, search and manage projects |
 | Collaboration  | Collaboration requests and members         |
 | Conversations  | Create and fetch conversations             |
@@ -131,6 +132,19 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 | PATCH  | `/users/me`          | Yes  | Update profile              | Owner only         |
 | GET    | `/users/me/projects` | Yes  | Get current user's projects | Authenticated user |
 | GET    | `/users`             | No   | Search users                | Paginated response |
+
+## Connections
+
+| Method | Endpoint | Auth | Description | Notes |
+| ------ | -------- | ---- | ----------- | ----- |
+| POST | `/connections/:publicId` | Yes | Send connection request | Authenticated user |
+| GET | `/connections/incoming` | Yes | List incoming requests | Authenticated user |
+| GET | `/connections/outgoing` | Yes | List outgoing requests | Authenticated user |
+| GET | `/connections` | Yes | List accepted connections | Authenticated user |
+| PATCH | `/connections/:publicId/accept` | Yes | Accept connection request | Recipient only |
+| PATCH | `/connections/:publicId/reject` | Yes | Reject connection request | Recipient only |
+| PATCH | `/connections/:publicId/cancel` | Yes | Cancel sent request | Sender only |
+| DELETE | `/connections/:publicId` | Yes | Remove connection | Either connected user |
 
 ## Projects
 
@@ -202,6 +216,9 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 | ----------------------- | ------------------ |
 | Public Profiles         | Public             |
 | User Profile Update     | Owner              |
+| Send Connection Request   | Authenticated User |
+| Manage Connection Request | Request Participants |
+| Remove Connection         | Connected Users |
 | Project Update          | Owner              |
 | Project Delete          | Owner              |
 | Collaboration Request   | Authenticated User |
@@ -226,6 +243,8 @@ The DevConnect backend exposes a REST API that enables user authentication, prof
 
 - username
 - skills
+- availability
+- experienceLevel
 
 **Projects**
 

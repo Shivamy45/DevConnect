@@ -21,15 +21,16 @@ Many developers struggle to:
 - Find meaningful projects to contribute to.
 - Build a public portfolio through collaboration.
 - Discover teammates with complementary skills.
+- Build long-term professional connections with other developers.
 - Manage project collaboration in a structured way.
 
-DevConnect aims to simplify this process by providing a dedicated collaboration platform.
+DevConnect aims to simplify this process by providing a dedicated platform for developer networking and project collaboration.
 
 ---
 
 # 3. Product Vision
 
-Create a platform where developers can easily turn ideas into collaborative projects while building experience, portfolios, and professional connections.
+Create a platform where developers can build professional networks, discover meaningful projects, form teams, collaborate on real-world software, and strengthen their portfolios through successful project completion.
 
 ---
 
@@ -46,16 +47,17 @@ Create a platform where developers can easily turn ideas into collaborative proj
 
 # 5. Core Features
 
-| Module         | Description                        |
-| -------------- | ---------------------------------- |
-| Authentication | Secure user accounts               |
-| Profiles       | Showcase skills and experience     |
-| Projects       | Create and manage projects         |
-| Collaboration  | Request and manage collaborators   |
-| Messaging      | Communicate with teammates         |
-| Reviews        | Leave feedback after collaboration |
-| Search         | Find users and projects            |
-| Notifications  | Stay updated on important events   |
+| Module                | Description                                 |
+| --------------------- | ------------------------------------------- |
+| Authentication        | Secure user accounts                        |
+| Profiles              | Showcase skills and experience              |
+| Developer Connections | Build and manage professional connections   |
+| Projects              | Create and manage projects                  |
+| Collaboration         | Manage project collaboration requests and team members |
+| Messaging             | Communicate with teammates                  |
+| Reviews               | Leave feedback after collaboration          |
+| Search                | Find users and projects                     |
+| Notifications         | Stay updated on important events            |
 
 ## Feature Status
 
@@ -63,6 +65,7 @@ Create a platform where developers can easily turn ideas into collaborative proj
 | -------------------------- | ------ |
 | Authentication             | MVP    |
 | User Profiles              | MVP    |
+| Developer Connections      | MVP    |
 | Projects                   | MVP    |
 | Collaboration Requests     | MVP    |
 | Messaging                  | MVP    |
@@ -104,20 +107,22 @@ Register / Login
 Complete Profile
    │
    ▼
-Browse Projects
-   │
-   ├── Create Project
-   │
-   └── Send Collaboration Request
-            │
-            ▼
-     Collaboration Accepted
-            │
-            ▼
-         Work Together
-            │
-            ▼
-       Leave Reviews
+Discover Developers ────────────── Browse Projects
+   │                                   │
+   ▼                                   ▼
+Send Connection Request         Create Project
+   │                                   │
+   ▼                                   ▼
+Build Network             Receive Collaboration Requests
+                                           │
+                                           ▼
+                                  Build Project Team
+                                           │
+                                           ▼
+                                   Work Together
+                                           │
+                                           ▼
+                                     Leave Reviews
 ```
 
 ---
@@ -138,6 +143,7 @@ Browse Projects
 
 - User authentication
 - Developer profiles
+- Developer connections
 - Project management
 - Collaboration requests
 - Direct messaging
@@ -163,6 +169,8 @@ The project is considered successful when users can:
 
 - Create an account.
 - Build a developer profile.
+- Build a professional developer network.
+- Discover other developers with complementary skills.
 - Create and discover projects.
 - Join projects through collaboration requests.
 - Communicate with collaborators.

@@ -10,7 +10,7 @@
 
 # 1. Overview
 
-DevConnect uses MongoDB as its primary database. Data is organized into collections that represent users, projects, collaborations, conversations, and other core resources. Relationships are maintained using document references.
+DevConnect uses MongoDB as its primary database. Data is organized into collections that support developer networking, project collaboration, communication, reviews, notifications, and authentication. Relationships are maintained using document references.
 
 ---
 
@@ -19,6 +19,7 @@ DevConnect uses MongoDB as its primary database. Data is organized into collecti
 | Collection             | Purpose                          |
 | ---------------------- | -------------------------------- |
 | Users                  | Store user accounts and profiles |
+| Connections            | Store developer connection requests and accepted connections |
 | Skills                 | List available skills            |
 | Projects               | Store project information        |
 | Collaboration Requests | Manage project join requests     |
@@ -37,6 +38,7 @@ DevConnect uses MongoDB as its primary database. Data is organized into collecti
 User
  │
  ├── Sessions
+ ├── Connections
  ├── Projects
  ├── Collaboration Requests
  ├── Collaborations
@@ -74,6 +76,17 @@ Conversation
 | skills          | ObjectId[] | Ref[], Optional  |
 | createdAt       | Date       | Auto             |
 | updatedAt       | Date       | Auto             |
+
+### Connections
+
+| Field     | Type     | Notes            |
+| --------- | -------- | ---------------- |
+| publicId  | String   | Unique, Required |
+| sender    | ObjectId | Ref(User), Required |
+| receiver  | ObjectId | Ref(User), Required |
+| status    | String   | Enum, Required |
+| createdAt | Date     | Auto |
+| updatedAt | Date     | Auto |
 
 ### Sessions
 
@@ -180,6 +193,7 @@ Conversation
 | Collection             | Indexed Fields                                  |
 | ---------------------- | ----------------------------------------------- |
 | Users                  | username, email, publicId                       |
+| Connections           | sender + receiver (compound unique), status     |
 | Skills                 | name                                            |
 | Projects               | owner, status, title (text), description (text) |
 | Collaboration Requests | project, sender (unique while pending), status  |
@@ -217,6 +231,7 @@ Text indexes are used for project titles and descriptions to support keyword sea
 
 # 8. Enumerations
 
+- **Connection.status**: Pending, Accepted, Rejected, Cancelled
 - **Project.status**: Draft, Open, In Progress, Completed, Archived
 - **Project.visibility**: Public, Private
 - **CollaborationRequest.status**: Pending, Accepted, Rejected, Withdrawn
@@ -233,6 +248,7 @@ Text indexes are used for project titles and descriptions to support keyword sea
 Users
  │
  ├── Sessions
+ ├────< Connections
  │
  ├────< Projects
  │          │
@@ -248,4 +264,4 @@ Users
 
 # 10. Summary
 
-The database is designed around a small set of collections with clear relationships and efficient indexing. The structure supports authentication, project collaboration, messaging, reviews, and future feature expansion while keeping the schema simple and maintainable. Session management supports multiple concurrent device logins.
+The database is organized around developer networking, project collaboration, and communication. Collections remain loosely coupled through references, expose public identifiers for external APIs, and use indexes for efficient lookups. The schema supports both one-to-one developer connections and one-to-many project collaboration while remaining extensible for future features.
