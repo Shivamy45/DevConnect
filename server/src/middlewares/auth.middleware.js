@@ -11,8 +11,10 @@ const authenticateUser = async (req, res, next) => {
 		});
 	}
 	try {
-		const verify = jwt.verify(token, process.env.SECRET_KEY);
-		const user = await userModel.findOne({ publicId: verify.sub });
+		const payload = jwt.verify(token, process.env.SECRET_KEY);
+		const user = await userModel
+			.findOne({ publicId: payload.sub })
+			.select("_id publicId username");
 
 		if (!user) {
 			return res.status(401).json({
@@ -20,14 +22,9 @@ const authenticateUser = async (req, res, next) => {
 				message: "Unauthorized",
 			});
 		}
-		req.user = {
-			id: user._id,
-			publicId: user.publicId,
-			username: user.username,
-		};
+		req.user = user;
 		next();
 	} catch (error) {
-		console.error(error);
 		return res.status(401).json({
 			success: false,
 			message: "Unauthorized",

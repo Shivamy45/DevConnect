@@ -1,156 +1,16 @@
-# DevConnect
+# React + Vite
 
-> A platform where developers discover projects, find collaborators, and build real-world software together.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Demo
+Currently, two official plugins are available:
 
-- Live Demo: Coming Soon
-- API: Coming Soon
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
----
+## React Compiler
 
-## Overview
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-DevConnect is a developer collaboration platform where developers can discover projects, build professional connections, find collaborators, communicate with teammates, and gain real-world development experience. It combines developer networking with project-based collaboration in a single platform.
+## Expanding the ESLint configuration
 
----
-
-## Architecture
-
-```text
-React (Vite)
-      │
-      ▼
-Express.js REST API
-      │
-      ▼
-MongoDB
-```
-
----
-
-## Features
-
-- User authentication
-- Developer profiles
-- Developer connections
-- Project creation and discovery
-- Collaboration requests
-- Project member management
-- Direct messaging
-- Reviews and reputation
-- Notifications
-- Search and filtering
-
----
-
-## Tech Stack
-
-| Layer          | Technology                |
-| -------------- | ------------------------- |
-| Frontend       | React, Vite, Tailwind CSS |
-| Backend        | Node.js, Express.js       |
-| Database       | MongoDB, Mongoose         |
-| Authentication | JWT, HTTP-only Cookies    |
-| API Style      | REST                      |
-
----
-
-## Project Structure
-
-```text
-client/     # React frontend
-server/     # Express backend
-docs/       # Project documentation
-```
-
----
-
-## Documentation
-
-| Document                     | Purpose                                       |
-| ---------------------------- | --------------------------------------------- |
-| `01_PRODUCT.md`              | Product vision, scope, and features           |
-| `02_API_SPECIFICATION.md`    | REST API reference                            |
-| `03_DATABASE_DESIGN.md`      | Database schema and relationships             |
-| `DEV_PROJECT_MASTER_PLAN.md` | Development roadmap and implementation phases |
-
----
-
-## Getting Started
-
-```bash
-git clone <repository-url>
-cd DevConnect
-
-# Backend
-cd server
-npm install
-
-# Frontend
-cd ../client
-npm install
-```
-
-Then:
-
-1. Configure the required environment variables.
-2. Start the backend server.
-3. Start the frontend development server.
-
-### Environment Variables
-
-Create a `.env` file inside the `server` directory and configure:
-
-- MONGODB_URI
-- JWT_SECRET
-- JWT_REFRESH_SECRET
-- CLIENT_URL
-
----
-
-## Status
-
-🚧 Under active development.
-
-Current focus:
-
-- Backend APIs
-- Database implementation
-- Frontend integration
-
----
-
-## Roadmap
-
-### MVP
-
-- Authentication
-- Developer profiles
-- Developer connections
-- Project management
-- Collaboration requests
-- Project member management
-- Messaging
-- Reviews
-- Notifications
-- Search and filtering
-
-### Future
-
-- Real-time messaging
-- GitHub integration
-- Team workspaces
-- AI-powered recommendations
-
----
-
-## Project Status
-
-This project is currently in MVP development following a backend-first approach. Product requirements, API specifications, and database design are defined before implementation to ensure consistent architecture and production-quality engineering.
-
----
-
-## License
-
-MIT License.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

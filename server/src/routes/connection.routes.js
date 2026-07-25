@@ -8,8 +8,10 @@ import {
 	rejectRequestController,
 	sendRequestController,
 	showAllConnectionController,
-} from "../controllers/connection.controller";
-import authenticateUser from "../middlewares/auth.middleware";
+} from "../controllers/connection.controller.js";
+import validate from "../middlewares/validation.middleware.js";
+import authenticateUser from "../middlewares/auth.middleware.js";
+import { userPublicIdParamSchema } from "../validations/common.validation.js";
 
 const router = Router();
 
@@ -17,7 +19,11 @@ router.use(authenticateUser);
 
 router.get("/", showAllConnectionController);
 
-router.post("/request", sendRequestController);
+router.post(
+	"/request/:publicId",
+	validate(userPublicIdParamSchema),
+	sendRequestController,
+);
 
 router.patch("/:publicId/accept", acceptRequestController);
 router.patch("/:publicId/reject", rejectRequestController);

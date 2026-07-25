@@ -1,8 +1,8 @@
 import userModel from "../models/user.model.js";
 
-export const getProfile = async (username) => {
+export const getProfile = async (publicId) => {
 	try {
-		const user = await userModel.findOne({ username });
+		const user = await userModel.findOne({ publicId });
 		if (!user) {
 			return {
 				status: 404,
@@ -40,7 +40,7 @@ export const getUserProfile = async (username) => {
 		const {
 			username,
 			name,
-			profilePicture,
+			profilePic,
 			bio,
 			education,
 			socials,
@@ -50,7 +50,7 @@ export const getUserProfile = async (username) => {
 		const publicUser = {
 			username,
 			name,
-			profilePicture,
+			profilePic,
 			bio,
 			education,
 			socials,
@@ -148,6 +148,71 @@ export const updateUsername = async (publicId, newUsername) => {
 			user: {
 				username: user.username,
 				usernameLastChangedAt: user.usernameLastChangedAt,
+			},
+		};
+	} catch (error) {
+		console.error(error);
+		return {
+			status: 500,
+			message: "Internal Server Error",
+			user: null,
+		};
+	}
+};
+
+export const updateAvatar = async (publicId, imageURL, imagePublicId) => {
+	try {
+		const user = await userModel.findOneAndUpdate(
+			{ publicId },
+			{
+				$set: {
+					profilePic: {
+						url: imageURL,
+						publicId: imagePublicId,
+					},
+				},
+			},
+			{ new: true, runValidators: true },
+		);
+		if (!user) {
+			return {
+				status: 404,
+				message: "User not found",
+				user: null,
+			};
+		}
+		return {
+			status: 200,
+			message: "Profile picture updated successfully",
+			user: {
+				profilePic: user.profilePic,
+			},
+		};
+	} catch (error) {
+		console.error(error);
+		return {
+			status: 500,
+			message: "Internal Server Error",
+			user: null,
+		};
+	}
+};
+
+export const getUserName = async (publicId) => {
+	try {
+		const user = await userModel.findOne({ publicId }).select("name");
+		if (!user) {
+			return {
+				status: 404,
+				message: "User not found",
+				user: null,
+			};
+		}
+		return {
+			status: 200,
+			message: "User's name found",
+			user: {
+				name: user.name,
 			},
 		};
 	} catch (error) {

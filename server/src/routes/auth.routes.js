@@ -1,14 +1,17 @@
 import { Router } from "express";
 import {
 	loginController,
-	signUpController,
+	refreshTokenController,
+	registerController,
 } from "../controllers/auth.controller.js";
 import validate from "../middlewares/validation.middleware.js";
-import { loginSchema, signUpSchema } from "../validations/auth.validation.js";
+import { loginSchema, registerSchema } from "../validations/auth.validation.js";
 
 const router = Router();
 
 router.post("/login", validate(loginSchema), loginController);
-router.post("/signup", validate(signUpSchema), signUpController);
+router.post("/register", validate(registerSchema), registerController);
+router.post("/refreshToken", refreshTokenController);
+router.post("/me", refreshTokenController);
 
 export default router;

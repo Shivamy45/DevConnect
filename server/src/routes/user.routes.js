@@ -1,31 +1,41 @@
 import { Router } from "express";
 import authenticateUser from "../middlewares/auth.middleware.js";
 
-import { updateProfileSchema } from "../validations/user.validation.js";
+import {
+	updateProfileSchema,
+	updateUsernameSchema,
+} from "../validations/user.validation.js";
 
 import {
 	getProfileController,
 	updateProfileController,
+	updateUsernameController,
 	getUserProfileController,
+	updateAvatarController,
+	generateAvatarController,
 } from "../controllers/user.controller.js";
+import validate from "../middlewares/validation.middleware.js";
 
 const router = Router();
 
-router.get("/profile", authenticateUser, getProfileController);
+router.get("/me", authenticateUser, getProfileController);
 
 router.patch(
-	"/profile",
+	"/me",
 	authenticateUser,
-	updateProfileSchema,
+	validate(updateProfileSchema),
 	updateProfileController,
 );
+router.patch("/me/avatar", authenticateUser, updateAvatarController);
+
+router.patch("/me/avatar/default", authenticateUser, generateAvatarController);
 
 router.get("/:username", getUserProfileController);
 
 router.patch(
 	"/username",
 	authenticateUser,
-	updateUsernameSchema,
+	validate(updateUsernameSchema),
 	updateUsernameController,
 );
 

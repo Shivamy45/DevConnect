@@ -23,6 +23,7 @@ const userSchema = mongoose.Schema(
 		username: {
 			type: String,
 			unique: true,
+			index: true,
 			trim: true,
 			lowercase: true,
 			minlength: 3,
@@ -35,9 +36,15 @@ const userSchema = mongoose.Schema(
 			minlength: 3,
 			maxlength: 50,
 		},
-		profilePicture: {
-			type: String,
-			default: "",
+		profilePic: {
+			publicId: {
+				type: String,
+				default: "",
+			},
+			url: {
+				type: String,
+				default: "",
+			},
 		},
 		bio: {
 			type: String,

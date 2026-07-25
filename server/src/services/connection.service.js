@@ -2,10 +2,12 @@ import connectionModel from "../models/connection.model.js";
 import { nanoid } from "nanoid";
 import userModel from "../models/user.model.js";
 
-export const sendRequest = async (senderId, receiverId) => {
+export const sendRequest = async (senderId, receiverPublicId) => {
 	try {
-		const receiverExist = await userModel.findOne({ _id: receiverId });
-		if (!receiverExist || senderId === receiverId) {
+		const receiver = await userModel.findOne({
+			publicId: receiverPublicId,
+		});
+		if (!receiver || senderId.equals(receiver._id)) {
 			return {
 				status: 400,
 				message: "Connection cannot be sent",
@@ -15,8 +17,8 @@ export const sendRequest = async (senderId, receiverId) => {
 
 		const alreadyFound = await connectionModel.findOne({
 			$or: [
-				{ sender: senderId, receiver: receiverId },
-				{ receiver: senderId, sender: receiverId },
+				{ sender: senderId, receiver: receiver._id },
+				{ receiver: senderId, sender: receiver._id },
 			],
 		});
 		if (alreadyFound) {
@@ -52,9 +54,9 @@ export const sendRequest = async (senderId, receiverId) => {
 			}
 		}
 		const connection = await connectionModel.create({
-			publicId: nanoid(12),
+			publicId: "CON_" + nanoid(12),
 			sender: senderId,
-			receiver: receiverId,
+			receiver: receiver._id,
 		});
 		return {
 			status: 200,
@@ -70,10 +72,10 @@ export const sendRequest = async (senderId, receiverId) => {
 		};
 	}
 };
-export const acceptRequest = async (receiverId, connectionId) => {
+export const acceptRequest = async (receiverId, connectionPublicId) => {
 	try {
 		const connection = await connectionModel.findOne({
-			publicId: connectionId,
+			publicId: connectionPublicId,
 		});
 		if (!connection) {
 			return {
@@ -129,10 +131,10 @@ export const acceptRequest = async (receiverId, connectionId) => {
 		};
 	}
 };
-export const rejectRequest = async (receiverId, connectionId) => {
+export const rejectRequest = async (receiverId, connectionPublicId) => {
 	try {
 		const connection = await connectionModel.findOne({
-			publicId: connectionId,
+			publicId: connectionPublicId,
 		});
 		if (!connection) {
 			return {
@@ -189,10 +191,10 @@ export const rejectRequest = async (receiverId, connectionId) => {
 		};
 	}
 };
-export const cancelRequest = async (senderId, connectionId) => {
+export const cancelRequest = async (senderId, connectionPublicId) => {
 	try {
 		const connection = await connectionModel.findOne({
-			publicId: connectionId,
+			publicId: connectionPublicId,
 		});
 		if (!connection) {
 			return {
@@ -309,10 +311,10 @@ export const showAllConnection = async (userId) => {
 		};
 	}
 };
-export const deleteConnection = async (userId, connectionId) => {
+export const deleteConnection = async (userId, connectionPublicId) => {
 	try {
 		const connection = await connectionModel.findOne({
-			publicId: connectionId,
+			publicId: connectionPublicId,
 		});
 		if (!connection) {
 			return {
