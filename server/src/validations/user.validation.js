@@ -22,34 +22,67 @@ export const updateProfileSchema = z
 				education: z
 					.object({
 						college: z.string().trim().min(2).max(100).optional(),
-						branch: z.string().trim().min(2).max(50).optional(),
-						year: z.number().min(1).max(5).optional(),
+						fieldOfStudy: z
+							.string()
+							.trim()
+							.min(2)
+							.max(50)
+							.optional(),
+						graduationYear: z
+							.number()
+							.min(2026)
+							.max(2100)
+							.optional(),
 					})
 					.strict()
 					.optional(),
-				socials: z
-					.object({
-						github: z
-							.string()
-							.url("Please enter a valid GitHub URL")
-							.optional(),
-						linkedin: z
-							.string()
-							.url("Please enter a valid LinkedIn URL")
-							.optional(),
-						portfolio: z
-							.string()
-							.url("Please enter a valid Portfolio URL")
-							.optional(),
-					})
-					.strict()
+				externalLinks: z
+					.array(
+						z
+							.object({
+								name: z.string().trim().min(1).max(50),
+								url: z.string().trim().url("Please enter a valid URL"),
+							})
+							.strict(),
+					)
+					.max(10)
+					.optional(),
+				skills: z
+					.array(
+						z
+							.object({
+								skill: z.string().length(24),
+								level: z.enum([
+									"BEGINNER",
+									"INTERMEDIATE",
+									"ADVANCED",
+								]),
+							})
+							.strict(),
+					)
+					.max(30)
+					.optional(),
+				wantToLearn: z
+					.array(
+						z
+							.object({
+								skill: z.string().length(24),
+								level: z.enum([
+									"BEGINNER",
+									"INTERMEDIATE",
+									"ADVANCED",
+								]),
+							})
+							.strict(),
+					)
+					.max(30)
 					.optional(),
 				developerType: z
 					.enum([
-						"Student",
-						"Professional",
-						"Freelancer",
-						"Self-Taught",
+						"STUDENT",
+						"PROFESSIONAL",
+						"FREELANCER",
+						"SELF_TAUGHT",
 					])
 					.optional(),
 			})

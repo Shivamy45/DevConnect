@@ -15,6 +15,7 @@ import {
 	generateAvatarController,
 } from "../controllers/user.controller.js";
 import validate from "../middlewares/validation.middleware.js";
+import validateAvatarUpload from "../middlewares/avatar.middleware.js";
 
 const router = Router();
 
@@ -26,17 +27,18 @@ router.patch(
 	validate(updateProfileSchema),
 	updateProfileController,
 );
-router.patch("/me/avatar", authenticateUser, updateAvatarController);
+router.patch("/me/avatar", authenticateUser, validateAvatarUpload, updateAvatarController);
 
 router.patch("/me/avatar/default", authenticateUser, generateAvatarController);
 
-router.get("/:username", getUserProfileController);
-
 router.patch(
-	"/username",
+	"/me/username",
 	authenticateUser,
 	validate(updateUsernameSchema),
 	updateUsernameController,
 );
+
+router.get("/:username", getUserProfileController);
+
 
 export default router;

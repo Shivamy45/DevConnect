@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
 	{
 		publicId: {
 			type: String,
@@ -25,6 +25,7 @@ const userSchema = mongoose.Schema(
 			unique: true,
 			index: true,
 			trim: true,
+			required: true,
 			lowercase: true,
 			minlength: 3,
 			maxlength: 30,
@@ -52,36 +53,60 @@ const userSchema = mongoose.Schema(
 			default: "",
 			maxlength: 300,
 		},
-		socials: {
-			github: {
-				type: String,
-				default: "",
+		externalLinks: [
+			{
+				name: {
+					type: String,
+					trim: true,
+				},
+
+				url: {
+					type: String,
+					trim: true,
+				},
 			},
-			linkedin: {
-				type: String,
-				default: "",
+		],
+		skills: [
+			{
+				skill: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Skill",
+				},
+				level: {
+					type: String,
+					enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
+				},
 			},
-			portfolio: {
-				type: String,
-				default: "",
+		],
+		wantToLearn: [
+			{
+				skill: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Skill",
+				},
+				level: {
+					type: String,
+					enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
+				},
 			},
-		},
+		],
 		education: {
 			college: {
 				type: String,
 				trim: true,
 			},
-			branch: {
+			fieldOfStudy: {
 				type: String,
 				trim: true,
 			},
-			year: {
+			graduationYear: {
 				type: Number,
 			},
 		},
 		developerType: {
 			type: String,
-			enum: ["Student", "Professional", "Freelancer", "Self-Taught"],
+			enum: ["STUDENT", "PROFESSIONAL", "FREELANCER", "SELF_TAUGHT"],
+			default: "STUDENT",
 		},
 		isVerified: {
 			type: Boolean,

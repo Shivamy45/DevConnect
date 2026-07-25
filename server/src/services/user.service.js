@@ -2,7 +2,12 @@ import userModel from "../models/user.model.js";
 
 export const getProfile = async (publicId) => {
 	try {
-		const user = await userModel.findOne({ publicId });
+		const user = await userModel
+			.findOne({ publicId })
+			.select(
+				"email username name profilePic bio education externalLinks skills wantToLearn developerType",
+			)
+			.populate("skills.skill wantToLearn.skill");
 		if (!user) {
 			return {
 				status: 404,
@@ -16,7 +21,6 @@ export const getProfile = async (publicId) => {
 			user,
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -27,7 +31,12 @@ export const getProfile = async (publicId) => {
 
 export const getUserProfile = async (username) => {
 	try {
-		const user = await userModel.findOne({ username });
+		const user = await userModel
+			.findOne({ username })
+			.select(
+				"username name profilePic bio education externalLinks skills wantToLearn developerType",
+			)
+			.populate("skills.skill wantToLearn.skill");
 
 		if (!user) {
 			return {
@@ -36,33 +45,12 @@ export const getUserProfile = async (username) => {
 				user: null,
 			};
 		}
-
-		const {
-			username,
-			name,
-			profilePic,
-			bio,
-			education,
-			socials,
-			developerType,
-		} = user.toObject();
-
-		const publicUser = {
-			username,
-			name,
-			profilePic,
-			bio,
-			education,
-			socials,
-			developerType,
-		};
 		return {
 			status: 200,
 			message: "User retrieved successfully",
-			user: publicUser,
+			user,
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -73,9 +61,34 @@ export const getUserProfile = async (username) => {
 
 export const updateProfile = async (publicId, newData) => {
 	try {
+		const allowedFields = [
+			"name",
+			"bio",
+			"education",
+			"developerType",
+			"skills",
+			"wantToLearn",
+			"externalLinks",
+		];
+		const updateData = {};
+
+		for (const key of allowedFields) {
+			if (newData[key] !== undefined) {
+				updateData[key] = newData[key];
+			}
+		}
+
+		if (Object.keys(updateData).length === 0) {
+			return {
+				status: 400,
+				message: "No valid fields provided",
+				user: null,
+			};
+		}
+
 		const user = await userModel.findOneAndUpdate(
 			{ publicId },
-			{ $set: newData },
+			{ $set: updateData },
 			{ new: true, runValidators: true },
 		);
 
@@ -92,7 +105,6 @@ export const updateProfile = async (publicId, newData) => {
 			user,
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -111,6 +123,7 @@ export const updateUsername = async (publicId, newUsername) => {
 				user: null,
 			};
 		}
+		newUsername = newUsername.trim().toLowerCase();
 		if (user.username === newUsername) {
 			return {
 				status: 400,
@@ -151,7 +164,6 @@ export const updateUsername = async (publicId, newUsername) => {
 			},
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -189,7 +201,6 @@ export const updateAvatar = async (publicId, imageURL, imagePublicId) => {
 			},
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
@@ -216,7 +227,6 @@ export const getUserName = async (publicId) => {
 			},
 		};
 	} catch (error) {
-		console.error(error);
 		return {
 			status: 500,
 			message: "Internal Server Error",
