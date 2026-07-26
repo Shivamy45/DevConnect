@@ -1,4 +1,5 @@
 import cloudinary from "../config/cloudinary.js";
+import ApiError from "../utils/ApiError.js";
 
 export const generateDefaultAvatar = (name) => {
 	const trimmedName = (name ?? "").trim();
@@ -47,10 +48,6 @@ export const uploadAvatar = async (publicId, path) => {
 			avatar: uploadResult,
 		};
 	} catch (error) {
-		return {
-			status: 500,
-			message: "Internal Server Error",
-			avatar: null,
-		};
+		throw new ApiError(500, "Internal Server Error");
 	}
 };

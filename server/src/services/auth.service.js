@@ -1,16 +1,16 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebaccessToken";
+import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import userModel from "../models/user.model.js";
 import { generateDefaultAvatar, uploadAvatar } from "./avatar.service.js";
+import ApiError from "../utils/ApiError.js";
 
 export const loginUser = async (email, password) => {
 	const user = await userModel.findOne({ email }).select("+password");
-	if (!user) return { status: 401, message: "User Not Found" };
+	if (!user) throw new ApiError(401, "User Not Found");
 
 	const match = await bcrypt.compare(password, user.password);
-	if (!match)
-		return { status: 401, message: "Email or Password is incorrect" };
+	if (!match) throw new ApiError(401, "Email or Password is incorrect");
 	const { password: _, ...userWithoutPassword } = user.toObject();
 	const tokens = generateTokens(user.publicId);
 	return {
@@ -26,7 +26,7 @@ export const registerUser = async (userDetails) => {
 		userDetails;
 
 	const found = await userModel.findOne({ email });
-	if (found) return { status: 409, message: "User already registered" };
+	if (found) throw new ApiError(409, "User already registered");
 
 	const hashPass = await bcrypt.hash(password, 10);
 
@@ -52,15 +52,12 @@ export const registerUser = async (userDetails) => {
 		});
 
 		const avatarSvg = await generateDefaultAvatar(user.name);
-		const upload = await uploadAvatar(user.publicId, avatarSvg);
-		if (upload.status === 500) {
+		let upload;
+		try {
+			upload = await uploadAvatar(user.publicId, avatarSvg);
+		} catch (error) {
 			await userModel.findOneAndDelete({ publicId: user.publicId });
-			return {
-				status: 503,
-				message: "Avatar generation failed",
-				user: null,
-				tokens: null,
-			};
+			throw new ApiError(503, "Avatar generation failed");
 		}
 		user.profilePic.url = upload.avatar.secure_url;
 		user.profilePic.publicId = upload.avatar.public_id;
@@ -92,36 +89,20 @@ function generateTokens(publicId) {
 }
 
 export const refreshToken = async (jwtToken) => {
-	try {
-		if (!jwtToken) {
-			return {
-				status: 401,
-				message: "No refresh token found",
-			};
-		}
-		const refreshToken = jwt.verify(jwtToken, process.env.SECRET_KEY);
-		if (!refreshToken) {
-			return {
-				status: 401,
-				message: "Refresh token expired",
-			};
-		}
-		const accessToken = jwt.sign(
-			{ sub: refreshToken.sub },
-			process.env.SECRET_KEY,
-			{
-				expiresIn: "15m",
-			},
-		);
-		return {
-			status: 200,
-			message: "Access token generated",
-			tokens: { accessToken, jwtToken },
-		};
-	} catch (error) {
-		return {
-			status: 400,
-			message: "Invalid or expired refresh token",
-		};
+	if (!jwtToken) {
+		throw new ApiError(401, "No refresh token found");
 	}
+	const refreshToken = jwt.verify(jwtToken, process.env.SECRET_KEY);
+	const accessToken = jwt.sign(
+		{ sub: refreshToken.sub },
+		process.env.SECRET_KEY,
+		{
+			expiresIn: "15m",
+		},
+	);
+	return {
+		status: 200,
+		message: "Access token generated",
+		tokens: { accessToken, jwtToken },
+	};
 };

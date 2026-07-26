@@ -31,8 +31,6 @@ export const registerController = async (req, res) => {
 
 	const result = await registerUser(userDetails);
 
-	
-
 	if (result.tokens.accessToken)
 		res.cookie("token", result.tokens.accessToken);
 	if (result.tokens.refreshToken) {

@@ -5,11 +5,7 @@ const validate = (schema) => {
 			params: req.params,
 			query: req.query,
 		});
-		if (!result.success)
-			return res.status(400).json({
-				success: false,
-				error: result.error.issues,
-			});
+		if (!result.success) return next(result.error);
 		req.body = result.data.body;
 		req.params = result.data.params;
 		req.query = result.data.query;

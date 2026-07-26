@@ -38,11 +38,6 @@ export const updateProfileController = async (req, res) => {
 
 export const updateAvatarController = async (req, res) => {
 	const uploadResult = await uploadAvatar(req.user.publicId, req.file.path);
-	if (!uploadResult.avatar) {
-		return res.status(uploadResult.status).json({
-			message: uploadResult.message,
-		});
-	}
 	const result = await updateAvatar(
 		req.user.publicId,
 		uploadResult.avatar.secure_url,
@@ -57,18 +52,8 @@ export const updateAvatarController = async (req, res) => {
 
 export const generateAvatarController = async (req, res) => {
 	const nameResult = await getUserName(req.user.publicId);
-	if (!nameResult.user) {
-		return res.status(nameResult.status).json({
-			message: nameResult.message,
-		});
-	}
 	const url = await generateDefaultAvatar(nameResult.user.name);
 	const uploadResult = await uploadAvatar(req.user.publicId, url);
-	if (!uploadResult.avatar) {
-		return res.status(uploadResult.status).json({
-			message: uploadResult.message,
-		});
-	}
 	const result = await updateAvatar(
 		req.user.publicId,
 		uploadResult.avatar.secure_url,

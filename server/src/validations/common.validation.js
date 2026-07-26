@@ -1,30 +1,22 @@
 import { z } from "zod";
 
-export const connectionPublicIdParamSchema = z
-	.object({
-		params: z
-			.object({
-				publicId: z
-					.string()
-					.trim()
-					.regex(
-						/^CON_[A-Za-z0-9_-]{12}$/,
-						"Invalid connection public ID",
-					),
-			})
-			.strict(),
-	})
-	.strict();
+export const createPublicIdParamSchema = (prefix, entityName) =>
+	z
+		.object({
+			params: z
+				.object({
+					publicId: z
+						.string()
+						.trim()
+						.regex(
+							new RegExp(`^${prefix}[A-Za-z0-9_-]{12}$`),
+							`Invalid ${entityName} public ID`,
+						),
+				})
+				.strict(),
+		})
+		.strict();
 
-export const userPublicIdParamSchema = z
-	.object({
-		params: z
-			.object({
-				publicId: z
-					.string()
-					.trim()
-					.regex(/^USR_[A-Za-z0-9_-]{12}$/, "Invalid user public ID"),
-			})
-			.strict(),
-	})
-	.strict();
+export const objectIdSchema = z
+	.string()
+	.regex(/^[a-fA-F0-9]{24}$/, "Invalid ObjectId");

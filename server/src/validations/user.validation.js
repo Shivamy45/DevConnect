@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { objectIdSchema } from "./common.validation";
 
 export const updateProfileSchema = z
 	.object({
@@ -11,22 +12,27 @@ export const updateProfileSchema = z
 						/^[A-Za-z\s]+$/,
 						"Name can only contain letters and spaces",
 					)
-					.min(3, "Name must be at least 3 characters")
-					.max(50, "Name cannot exceed 50 characters")
+					.minLength(3, "Name must be at least 3 characters")
+					.maxLength(50, "Name cannot exceed 50 characters")
 					.optional(),
 				bio: z
 					.string()
 					.trim()
-					.max(300, "Bio cannot exceed 300 characters")
+					.maxLength(300, "Bio cannot exceed 300 characters")
 					.optional(),
 				education: z
 					.object({
-						college: z.string().trim().min(2).max(100).optional(),
+						college: z
+							.string()
+							.trim()
+							.minLength(2)
+							.maxLength(100)
+							.optional(),
 						fieldOfStudy: z
 							.string()
 							.trim()
-							.min(2)
-							.max(50)
+							.minLength(2)
+							.maxLength(50)
 							.optional(),
 						graduationYear: z
 							.number()
@@ -40,18 +46,25 @@ export const updateProfileSchema = z
 					.array(
 						z
 							.object({
-								name: z.string().trim().min(1).max(50),
-								url: z.string().trim().url("Please enter a valid URL"),
+								name: z
+									.string()
+									.trim()
+									.minLength(1)
+									.maxLength(50),
+								url: z
+									.string()
+									.trim()
+									.url("Please enter a valid URL"),
 							})
 							.strict(),
 					)
-					.max(10)
+					.maxLength(10)
 					.optional(),
 				skills: z
 					.array(
 						z
 							.object({
-								skill: z.string().length(24),
+								skill: objectIdSchema,
 								level: z.enum([
 									"BEGINNER",
 									"INTERMEDIATE",
@@ -60,13 +73,13 @@ export const updateProfileSchema = z
 							})
 							.strict(),
 					)
-					.max(30)
+					.maxLength(30)
 					.optional(),
 				wantToLearn: z
 					.array(
 						z
 							.object({
-								skill: z.string().length(24),
+								skill: objectIdSchema,
 								level: z.enum([
 									"BEGINNER",
 									"INTERMEDIATE",
@@ -75,7 +88,7 @@ export const updateProfileSchema = z
 							})
 							.strict(),
 					)
-					.max(30)
+					.maxLength(30)
 					.optional(),
 				developerType: z
 					.enum([
@@ -101,8 +114,8 @@ export const updateUsernameSchema = z
 						/^[a-z0-9_-]+$/,
 						"Username can only contain letters, numbers, _, and -",
 					)
-					.min(3, "Username must be at least 3 characters")
-					.max(20, "Username cannot exceed 20 characters"),
+					.minLength(3, "Username must be at least 3 characters")
+					.maxLength(20, "Username cannot exceed 20 characters"),
 			})
 			.strict(),
 	})
