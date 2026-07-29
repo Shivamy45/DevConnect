@@ -12,25 +12,27 @@ const projectSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 			trim: true,
-			minlength: 3,
-			maxlength: 40,
+			min: 3,
+			max: 40,
 		},
 		description: {
 			type: String,
 			trim: true,
-			maxlength: 500,
+			max: 500,
 		},
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
+			index: true,
 			required: true,
 		},
 		visibility: {
 			type: String,
 			enum: ["PUBLIC", "PRIVATE", "UNLISTED"],
+			index: true,
 			default: "PUBLIC",
 		},
-		skills: [
+		requiredSkills: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "Skill",
@@ -52,6 +54,17 @@ const projectSchema = new mongoose.Schema(
 		coverImage: {
 			publicId: String,
 			url: String,
+		},
+		status: {
+			type: String,
+			enum: ["OPEN", "IN_PROGRESS", "COMPLETED"],
+			default: "OPEN",
+			index: true,
+		},
+		maxMembers: {
+			type: Number,
+			default: 5,
+			min: 1,
 		},
 	},
 	{ timestamps: true },

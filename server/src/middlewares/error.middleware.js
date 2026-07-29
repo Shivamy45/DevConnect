@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { ZodError } from "zod";
 import ApiError from "../utils/ApiError.js";
+import multer from "multer";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -80,6 +81,18 @@ const buildErrorResponse = (err) => {
 			message: "Validation failed",
 			errors: formatZodErrors(err),
 		};
+	}
+
+	
+	if (err instanceof multer.MulterError) {
+		if (err.code === "LIMIT_FILE_SIZE") {
+			return {
+				statusCode: 413,
+				message: "Image size must be less than 2MB",
+			};
+		}
+
+		return { statusCode: 400, message: `Upload error: ${err.message}` };
 	}
 
 	return {

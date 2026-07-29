@@ -37,11 +37,11 @@ export const updateProfileController = async (req, res) => {
 };
 
 export const updateAvatarController = async (req, res) => {
-	const uploadResult = await uploadAvatar(req.user.publicId, req.file.path);
+	const uploadResult = await uploadAvatar(req.user.publicId, req.file.buffer);
 	const result = await updateAvatar(
 		req.user.publicId,
-		uploadResult.avatar.secure_url,
-		uploadResult.avatar.public_id,
+		uploadResult.profilePic.url,
+		uploadResult.profilePic.publicId,
 	);
 
 	res.status(result.status).json({
@@ -52,12 +52,12 @@ export const updateAvatarController = async (req, res) => {
 
 export const generateAvatarController = async (req, res) => {
 	const nameResult = await getUserName(req.user.publicId);
-	const url = await generateDefaultAvatar(nameResult.user.name);
-	const uploadResult = await uploadAvatar(req.user.publicId, url);
+	const svgPath = await generateDefaultAvatar(nameResult.user.name);
+	const uploadResult = await uploadAvatar(req.user.publicId, svgPath, true);
 	const result = await updateAvatar(
 		req.user.publicId,
-		uploadResult.avatar.secure_url,
-		uploadResult.avatar.public_id,
+		uploadResult.profilePic.url,
+		uploadResult.profilePic.publicId,
 	);
 
 	res.status(result.status).json({

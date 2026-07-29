@@ -61,7 +61,7 @@ export const updateProfile = async (publicId, newData) => {
 	const user = await userModel.findOneAndUpdate(
 		{ publicId },
 		{ $set: updateData },
-		{ new: true, runValidators: true },
+		{ returnDocument: "after", runValidators: true },
 	);
 
 	if (!user) {
@@ -123,7 +123,7 @@ export const updateAvatar = async (publicId, imageURL, imagePublicId) => {
 				},
 			},
 		},
-		{ new: true, runValidators: true },
+		{ returnDocument: "after", runValidators: true },
 	);
 	if (!user) {
 		throw new ApiError(404, "User not found");

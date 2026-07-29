@@ -27,15 +27,15 @@ const userSchema = new mongoose.Schema(
 			trim: true,
 			required: true,
 			lowercase: true,
-			minlength: 3,
-			maxlength: 30,
+			min: 3,
+			max: 30,
 		},
 		name: {
 			type: String,
 			trim: true,
 			required: true,
-			minlength: 3,
-			maxlength: 50,
+			min: 3,
+			max: 50,
 		},
 		profilePic: {
 			publicId: {
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			trim: true,
 			default: "",
-			maxlength: 300,
+			max: 300,
 		},
 		externalLinks: [
 			{

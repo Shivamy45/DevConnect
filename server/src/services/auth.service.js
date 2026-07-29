@@ -51,17 +51,16 @@ export const registerUser = async (userDetails) => {
 			developerType,
 		});
 
-		const avatarSvg = await generateDefaultAvatar(user.name);
-		let upload;
+		const avatarSvg = generateDefaultAvatar(user.name);
 		try {
-			upload = await uploadAvatar(user.publicId, avatarSvg);
+			const upload = await uploadAvatar(user.publicId, avatarSvg);
+			user.profilePic.url = upload.profilePic.url;
+			user.profilePic.publicId = upload.profilePic.publicId;
+			await user.save();
 		} catch (error) {
-			await userModel.findOneAndDelete({ publicId: user.publicId });
-			throw new ApiError(503, "Avatar generation failed");
+			console.error(error);
+			throw new ApiError(503, "Uploading Avatar failed");
 		}
-		user.profilePic.url = upload.avatar.secure_url;
-		user.profilePic.publicId = upload.avatar.public_id;
-		await user.save();
 	} catch (error) {
 		if (user) await userModel.findOneAndDelete({ publicId: user.publicId });
 		throw error;
@@ -103,6 +102,6 @@ export const refreshToken = async (jwtToken) => {
 	return {
 		status: 200,
 		message: "Access token generated",
-		tokens: { accessToken, jwtToken },
+		tokens: { accessToken },
 	};
 };

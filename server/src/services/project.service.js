@@ -1,18 +1,21 @@
 import projectModel from "../models/project.model.js";
 import skillModel from "../models/skill.model.js";
 import ApiError from "../utils/ApiError.js";
+import { nanoid } from "nanoid";
 
 export const createProject = async (userId, projectDetails) => {
-	if (projectDetails.skills?.length) {
+	if (projectDetails.requiredSkills?.length) {
 		const isSkill = await skillModel.find({
-			_id: { $in: projectDetails.skills },
+			_id: { $in: projectDetails.requiredSkills },
 		});
-		if (isSkill.length !== projectDetails.skills.length) {
+		if (isSkill.length !== projectDetails.requiredSkills.length) {
 			throw new ApiError(400, "One or more skills not found");
 		}
+		projectDetails.requiredSkills = [...new Set(projectDetails.requiredSkills)];
 	}
 	const project = await projectModel.create({
 		...projectDetails,
+		publicId: "PRJ_" + nanoid(12),
 		owner: userId,
 	});
 	return {
@@ -25,7 +28,7 @@ export const createProject = async (userId, projectDetails) => {
 export const getProjectByPublicId = async (projectId) => {
 	const project = await projectModel
 		.findOne({ publicId: projectId })
-		.populate("owner skills");
+		.populate("owner requiredSkills");
 	if (!project) {
 		throw new ApiError(404, "Project not found");
 	}
@@ -43,13 +46,16 @@ export const updateProject = async (
 ) => {
 	if (Object.keys(projectDetails).length === 0)
 		throw new ApiError(400, "No changes found");
-	if (projectDetails.skills?.length) {
+	if (projectDetails.requiredSkills?.length) {
 		const isSkill = await skillModel.find({
-			_id: { $in: projectDetails.skills },
+			_id: { $in: projectDetails.requiredSkills },
 		});
-		if (isSkill.length !== projectDetails.skills.length) {
+		if (isSkill.length !== projectDetails.requiredSkills.length) {
 			throw new ApiError(400, "One or more skills not found");
 		}
+		projectDetails.requiredSkills = [
+			...new Set(projectDetails.requiredSkills),
+		];
 	}
 	const project = await projectModel.findOne({
 		publicId: projectPublicId,
@@ -83,7 +89,7 @@ export const deleteProject = async (userId, projectPublicId) => {
 	}
 	await project.deleteOne();
 	return {
-		status: 200,
+		status: 204,
 		message: "Project deleted successfully",
 	};
 };

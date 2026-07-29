@@ -9,7 +9,6 @@ const Discover = () => {
 			const response = await axios.get(
 				"https://jsonplaceholder.typicode.com/users",
 			);
-			console.log(response.data);
 			setData(response.data);
 		};
 		getResponse();

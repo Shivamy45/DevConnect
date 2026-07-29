@@ -36,18 +36,45 @@ export const generateDefaultAvatar = (name) => {
 	return url;
 };
 
-export const uploadAvatar = async (publicId, path) => {
-	try {
-		const uploadResult = await cloudinary.uploader.upload(path, {
-			public_id: `avatars/${publicId}`,
+export const uploadAvatar = async (
+	publicId,
+	avatarBufferOrPath,
+	isDefaultAvatar = false,
+) => {
+	let result;
+	if (isDefaultAvatar) {
+		result = await cloudinary.uploader.upload(avatarBufferOrPath, {
+			folder: "avatars",
+			public_id: `ATR_${publicId}`,
+			transformation: [{ width: 500, height: 500, crop: "limit" }],
 			overwrite: true,
 		});
-		return {
-			status: 200,
-			message: "Avatar uploaded successfully",
-			avatar: uploadResult,
-		};
-	} catch (error) {
-		throw new ApiError(500, "Internal Server Error");
+	} else {
+		result = await new Promise((resolve, reject) => {
+			const stream = cloudinary.uploader.upload_stream(
+				{
+					folder: "avatars",
+					transformation: [
+						{ width: 500, height: 500, crop: "limit" },
+					],
+					public_id: `ATR_${publicId}`,
+					overwrite: true,
+				},
+				(error, result) => {
+					if (error) return reject(error);
+					resolve(result);
+				},
+			);
+
+			stream.end(avatarBufferOrPath);
+		});
 	}
+	return {
+		status: 200,
+		message: "Avatar uploaded successfully",
+		profilePic: {
+			url: result.secure_url,
+			publicId: result.public_id,
+		},
+	};
 };

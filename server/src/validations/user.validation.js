@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { objectIdSchema } from "./common.validation";
+import { objectIdSchema } from "./common.validation.js";
 
 export const updateProfileSchema = z
 	.object({
@@ -12,27 +12,27 @@ export const updateProfileSchema = z
 						/^[A-Za-z\s]+$/,
 						"Name can only contain letters and spaces",
 					)
-					.minLength(3, "Name must be at least 3 characters")
-					.maxLength(50, "Name cannot exceed 50 characters")
+					.min(3, "Name must be at least 3 characters")
+					.max(50, "Name cannot exceed 50 characters")
 					.optional(),
 				bio: z
 					.string()
 					.trim()
-					.maxLength(300, "Bio cannot exceed 300 characters")
+					.max(300, "Bio cannot exceed 300 characters")
 					.optional(),
 				education: z
 					.object({
 						college: z
 							.string()
 							.trim()
-							.minLength(2)
-							.maxLength(100)
+							.min(2)
+							.max(100)
 							.optional(),
 						fieldOfStudy: z
 							.string()
 							.trim()
-							.minLength(2)
-							.maxLength(50)
+							.min(2)
+							.max(50)
 							.optional(),
 						graduationYear: z
 							.number()
@@ -49,8 +49,8 @@ export const updateProfileSchema = z
 								name: z
 									.string()
 									.trim()
-									.minLength(1)
-									.maxLength(50),
+									.min(1)
+									.max(50),
 								url: z
 									.string()
 									.trim()
@@ -58,7 +58,7 @@ export const updateProfileSchema = z
 							})
 							.strict(),
 					)
-					.maxLength(10)
+					.max(10)
 					.optional(),
 				skills: z
 					.array(
@@ -73,7 +73,7 @@ export const updateProfileSchema = z
 							})
 							.strict(),
 					)
-					.maxLength(30)
+					.max(30)
 					.optional(),
 				wantToLearn: z
 					.array(
@@ -88,7 +88,7 @@ export const updateProfileSchema = z
 							})
 							.strict(),
 					)
-					.maxLength(30)
+					.max(30)
 					.optional(),
 				developerType: z
 					.enum([
@@ -114,8 +114,8 @@ export const updateUsernameSchema = z
 						/^[a-z0-9_-]+$/,
 						"Username can only contain letters, numbers, _, and -",
 					)
-					.minLength(3, "Username must be at least 3 characters")
-					.maxLength(20, "Username cannot exceed 20 characters"),
+					.min(3, "Username must be at least 3 characters")
+					.max(20, "Username cannot exceed 20 characters"),
 			})
 			.strict(),
 	})
