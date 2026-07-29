@@ -116,6 +116,16 @@ const userSchema = new mongoose.Schema(
 			type: Date,
 			default: null,
 		},
+		refreshTokens: [
+			new mongoose.Schema(
+				{
+					tokenHash: { type: String, required: true },
+					expiresAt: { type: Date, required: true },
+					deviceInfo: { type: String, required: true },
+				},
+				{ timestamps: true },
+			),
+		],
 	},
 	{ timestamps: true },
 );

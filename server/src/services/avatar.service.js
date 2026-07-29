@@ -78,3 +78,11 @@ export const uploadAvatar = async (
 		},
 	};
 };
+
+export const deleteAvatar = async (publicId) => {
+	const deleted = await cloudinary.uploader.destroy(publicId);
+	return {
+		status: 200,
+		message: "Avatar deleted successfully",
+	};
+};

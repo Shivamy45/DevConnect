@@ -1,7 +1,9 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import userAgent from "express-useragent";
 const app = express();
 app.use(cookieParser());
+app.use(userAgent.express());
 
 // import indexRoutes from "./routes/index.routes.js";
 import userRoutes from "./routes/user.routes.js";

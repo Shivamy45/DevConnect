@@ -11,7 +11,7 @@ const authenticateUser = async (req, res, next) => {
 		});
 	}
 	try {
-		const payload = jwt.verify(token, process.env.SECRET_KEY);
+		const payload = jwt.verify(token, process.env.ACCESS_SECRET_KEY);
 		const user = await userModel
 			.findOne({ publicId: payload.sub })
 			.select("_id publicId username");
