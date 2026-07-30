@@ -70,8 +70,6 @@ export const uploadAvatar = async (
 		});
 	}
 	return {
-		status: 200,
-		message: "Avatar uploaded successfully",
 		profilePic: {
 			url: result.secure_url,
 			publicId: result.public_id,
@@ -80,9 +78,6 @@ export const uploadAvatar = async (
 };
 
 export const deleteAvatar = async (publicId) => {
-	const deleted = await cloudinary.uploader.destroy(publicId);
-	return {
-		status: 200,
-		message: "Avatar deleted successfully",
-	};
+	await cloudinary.uploader.destroy(publicId);
+	return null;
 };

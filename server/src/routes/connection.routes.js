@@ -1,53 +1,53 @@
 import { Router } from "express";
 import {
-	acceptRequestController,
-	cancelRequestController,
+	createConnectionRequestController,
 	deleteConnectionController,
-	incomingRequestsController,
-	outgoingRequestsController,
-	rejectRequestController,
-	sendRequestController,
-	showAllConnectionController,
+	listConnectionsController,
+	listIncomingConnectionRequestsController,
+	listOutgoingConnectionRequestsController,
+	updateConnectionRequestAcceptedController,
+	updateConnectionRequestCancelledController,
+	updateConnectionRequestRejectedController,
 } from "../controllers/connection.controller.js";
 import validate from "../middlewares/validation.middleware.js";
 import authenticateUser from "../middlewares/auth.middleware.js";
-import { createPublicIdParamSchema } from "../validations/common.validation.js";
+import { publicIdParamSchema } from "../validations/common.validation.js";
 
 const router = Router();
 
 router.use(authenticateUser);
 
-router.get("/", showAllConnectionController);
+router.get("/", listConnectionsController);
 
 router.post(
 	"/request/:publicId",
-	validate(createPublicIdParamSchema("USR_", "user")),
-	sendRequestController,
+	validate(publicIdParamSchema("USR_", "user")),
+	createConnectionRequestController,
 );
 
 router.patch(
 	"/:publicId/accept",
-	validate(createPublicIdParamSchema("CON_", "connection")),
-	acceptRequestController,
+	validate(publicIdParamSchema("CON_", "connection")),
+	updateConnectionRequestAcceptedController,
 );
 router.patch(
 	"/:publicId/reject",
-	validate(createPublicIdParamSchema("CON_", "connection")),
-	rejectRequestController,
+	validate(publicIdParamSchema("CON_", "connection")),
+	updateConnectionRequestRejectedController,
 );
 router.patch(
 	"/:publicId/cancel",
-	validate(createPublicIdParamSchema("CON_", "connection")),
-	cancelRequestController,
+	validate(publicIdParamSchema("CON_", "connection")),
+	updateConnectionRequestCancelledController,
 );
 
 router.delete(
 	"/:publicId",
-	validate(createPublicIdParamSchema("CON_", "connection")),
+	validate(publicIdParamSchema("CON_", "connection")),
 	deleteConnectionController,
 );
 
-router.get("/incoming", incomingRequestsController);
-router.get("/outgoing", outgoingRequestsController);
+router.get("/incoming", listIncomingConnectionRequestsController);
+router.get("/outgoing", listOutgoingConnectionRequestsController);
 
 export default router;

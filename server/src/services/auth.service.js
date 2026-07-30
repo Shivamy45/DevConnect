@@ -17,8 +17,6 @@ export const loginUser = async (email, password, deviceInfo) => {
 	});
 	const tokens = await generateTokens(user, deviceInfo);
 	return {
-		status: 200,
-		message: "User logged in",
 		user: userWithoutPassword,
 		tokens,
 	};
@@ -75,8 +73,6 @@ export const registerUser = async (userDetails, deviceInfo) => {
 
 	const { password: _, ...userWithoutPassword } = user.toObject();
 	return {
-		status: 201,
-		message: "Account created",
 		user: userWithoutPassword,
 		tokens,
 	};
@@ -144,8 +140,6 @@ export const refreshToken = async (jwtToken, deviceInfo) => {
 
 	const tokens = await generateTokens(user, deviceInfo);
 	return {
-		status: 200,
-		message: "Tokens generated",
 		tokens,
 	};
 };
@@ -171,8 +165,5 @@ export const logoutUser = async (jwtToken) => {
 			break;
 		}
 	}
-	return {
-		status: 200,
-		message: "Logged Out successfully",
-	};
+	return null;
 };

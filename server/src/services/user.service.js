@@ -12,8 +12,6 @@ export const getProfile = async (publicId) => {
 		throw new ApiError(404, "User not found");
 	}
 	return {
-		status: 200,
-		message: "Profile fetched successfully",
 		user,
 	};
 };
@@ -30,8 +28,6 @@ export const getUserProfile = async (username) => {
 		throw new ApiError(404, "User not found");
 	}
 	return {
-		status: 200,
-		message: "User retrieved successfully",
 		user,
 	};
 };
@@ -68,8 +64,6 @@ export const updateProfile = async (publicId, newData) => {
 		throw new ApiError(404, "User not found");
 	}
 	return {
-		status: 200,
-		message: "User profile updated",
 		user,
 	};
 };
@@ -103,8 +97,6 @@ export const updateUsername = async (publicId, newUsername) => {
 	user.usernameLastChangedAt = new Date();
 	await user.save();
 	return {
-		status: 200,
-		message: "Username changed successfully",
 		user: {
 			username: user.username,
 			usernameLastChangedAt: user.usernameLastChangedAt,
@@ -129,8 +121,6 @@ export const updateAvatar = async (publicId, imageURL, imagePublicId) => {
 		throw new ApiError(404, "User not found");
 	}
 	return {
-		status: 200,
-		message: "Profile picture updated successfully",
 		user: {
 			profilePic: user.profilePic,
 		},
@@ -143,8 +133,6 @@ export const getUserName = async (publicId) => {
 		throw new ApiError(404, "User not found");
 	}
 	return {
-		status: 200,
-		message: "User's name found",
 		user: {
 			name: user.name,
 		},

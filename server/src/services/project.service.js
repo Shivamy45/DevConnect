@@ -19,8 +19,6 @@ export const createProject = async (userId, projectDetails) => {
 		owner: userId,
 	});
 	return {
-		status: 201,
-		message: "Project created successfully",
 		project,
 	};
 };
@@ -33,8 +31,6 @@ export const getProjectByPublicId = async (projectId) => {
 		throw new ApiError(404, "Project not found");
 	}
 	return {
-		status: 200,
-		message: "Project found successfully",
 		project,
 	};
 };
@@ -71,8 +67,6 @@ export const updateProject = async (
 	}
 	await project.save();
 	return {
-		status: 200,
-		message: "Project updated successfully",
 		project,
 	};
 };
@@ -88,8 +82,5 @@ export const deleteProject = async (userId, projectPublicId) => {
 		throw new ApiError(403, "You are not authorized for this operation");
 	}
 	await project.deleteOne();
-	return {
-		status: 204,
-		message: "Project deleted successfully",
-	};
+	return null;
 };

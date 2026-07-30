@@ -24,8 +24,14 @@ router.patch(
 	"/:publicId",
 	authenticateUser,
 	validate(updateProjectSchema),
+	validate(publicIdParamSchema("PRJ_", "project")),
 	updateProjectController,
 );
-router.delete("/:publicId", authenticateUser, deleteProjectController);
+router.delete(
+	"/:publicId",
+	authenticateUser,
+	validate(publicIdParamSchema("PRJ_", "project")),
+	deleteProjectController,
+);
 
 export default router;

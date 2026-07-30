@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import userModel from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 
-export const sendRequest = async (senderId, receiverPublicId) => {
+export const createConnectionRequest = async (senderId, receiverPublicId) => {
 	const receiver = await userModel.findOne({
 		publicId: receiverPublicId,
 	});
@@ -31,8 +31,6 @@ export const sendRequest = async (senderId, receiverPublicId) => {
 			alreadyFound.status = "pending";
 			await alreadyFound.save();
 			return {
-				status: 200,
-				message: "Connection Request Sent",
 				connection: { status: alreadyFound.status },
 			};
 		}
@@ -43,13 +41,14 @@ export const sendRequest = async (senderId, receiverPublicId) => {
 		receiver: receiver._id,
 	});
 	return {
-		status: 200,
-		message: "Connection Request Sent",
 		connection: { status: connection.status },
 	};
 };
 
-export const acceptRequest = async (receiverId, connectionPublicId) => {
+export const updateConnectionRequestAccepted = async (
+	receiverId,
+	connectionPublicId,
+) => {
 	const connection = await connectionModel.findOne({
 		publicId: connectionPublicId,
 	});
@@ -74,15 +73,16 @@ export const acceptRequest = async (receiverId, connectionPublicId) => {
 	connection.status = "accepted";
 	await connection.save();
 	return {
-		status: 200,
-		message: "Connection request accepted",
 		connection: {
 			status: connection.status,
 		},
 	};
 };
 
-export const rejectRequest = async (receiverId, connectionPublicId) => {
+export const updateConnectionRequestRejected = async (
+	receiverId,
+	connectionPublicId,
+) => {
 	const connection = await connectionModel.findOne({
 		publicId: connectionPublicId,
 	});
@@ -110,15 +110,16 @@ export const rejectRequest = async (receiverId, connectionPublicId) => {
 	connection.status = "rejected";
 	await connection.save();
 	return {
-		status: 200,
-		message: "Connection request rejected",
 		connection: {
 			status: connection.status,
 		},
 	};
 };
 
-export const cancelRequest = async (senderId, connectionPublicId) => {
+export const updateConnectionRequestCancelled = async (
+	senderId,
+	connectionPublicId,
+) => {
 	const connection = await connectionModel.findOne({
 		publicId: connectionPublicId,
 	});
@@ -146,46 +147,38 @@ export const cancelRequest = async (senderId, connectionPublicId) => {
 	connection.status = "cancelled";
 	await connection.save();
 	return {
-		status: 200,
-		message: "Connection request cancelled",
 		connection: {
 			status: connection.status,
 		},
 	};
 };
 
-export const incomingRequests = async (userId) => {
+export const listIncomingConnectionRequests = async (userId) => {
 	const requests = await connectionModel.find({
 		receiver: userId,
 		status: "pending",
 	});
 	return {
-		status: 200,
-		message: "Incoming requests",
 		requests,
 	};
 };
 
-export const outgoingRequests = async (userId) => {
+export const listOutgoingConnectionRequests = async (userId) => {
 	const requests = await connectionModel.find({
 		sender: userId,
 		status: "pending",
 	});
 	return {
-		status: 200,
-		message: "Outgoing requests",
 		requests,
 	};
 };
 
-export const showAllConnection = async (userId) => {
+export const listConnections = async (userId) => {
 	const connections = await connectionModel.find({
 		$or: [{ sender: userId }, { receiver: userId }],
 		status: "accepted",
 	});
 	return {
-		status: 200,
-		message: "Connections",
 		connections,
 	};
 };
@@ -209,8 +202,5 @@ export const deleteConnection = async (userId, connectionPublicId) => {
 		);
 	}
 	await connection.deleteOne();
-	return {
-		status: 200,
-		message: "Connection deleted",
-	};
+	return null;
 };

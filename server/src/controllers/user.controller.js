@@ -14,25 +14,34 @@ import {
 export const getProfileController = async (req, res) => {
 	const result = await getProfile(req.user.publicId);
 
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "Profile fetched successfully",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
 export const getUserProfileController = async (req, res) => {
 	const result = await getUserProfile(req.params.username);
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "User retrieved successfully",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
 export const updateProfileController = async (req, res) => {
 	const result = await updateProfile(req.user.publicId, req.body);
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "User profile updated",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
@@ -44,9 +53,12 @@ export const updateAvatarController = async (req, res) => {
 		uploadResult.profilePic.publicId,
 	);
 
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "Profile picture updated successfully",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
@@ -60,16 +72,22 @@ export const generateAvatarController = async (req, res) => {
 		uploadResult.profilePic.publicId,
 	);
 
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "Profile picture updated successfully",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
 export const updateUsernameController = async (req, res) => {
 	const result = await updateUsername(req.user.publicId, req.body.username);
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "Username changed successfully",
+		data: {
+			user: result.user,
+		},
 	});
 };

@@ -20,9 +20,12 @@ export const loginController = async (req, res) => {
 		});
 	}
 
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "User logged in",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
@@ -41,9 +44,12 @@ export const registerController = async (req, res) => {
 			maxAge: 24 * 60 * 60 * 1000,
 		});
 	}
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(201).json({
+		success: true,
+		message: "Account created",
+		data: {
+			user: result.user,
+		},
 	});
 };
 
@@ -52,8 +58,9 @@ export const refreshTokenController = async (req, res) => {
 	if (result.tokens.accessToken) {
 		res.cookie("token", result.tokens.accessToken);
 	}
-	res.status(result.status).json({
-		message: result.message,
-		user: result.user,
+	res.status(200).json({
+		success: true,
+		message: "Tokens generated",
+		data: null,
 	});
 };

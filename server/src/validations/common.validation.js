@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createPublicIdParamSchema = (prefix, entityName) =>
+export const publicIdParamSchema = (prefix, entityName) =>
 	z
 		.object({
 			params: z
