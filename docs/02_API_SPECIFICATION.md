@@ -97,18 +97,19 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 # 3. API Modules
 
-| Module         | Purpose                                    |
-| -------------- | ------------------------------------------ |
-| Authentication | Register, login, logout, refresh token     |
-| Users          | Profile, skills, account management        |
+| Module         | Purpose                                                |
+| -------------- | ------------------------------------------------------ |
+| Authentication | Register, login, logout, refresh token                 |
+| Users          | Profile, skills, account management                    |
 | Connections    | Developer connection requests and professional network |
-| Projects       | Create, update, search and manage projects |
-| Collaboration  | Collaboration requests and members         |
-| Conversations  | Create and fetch conversations             |
-| Messages       | Send and receive messages                  |
-| Reviews        | Submit and view reviews                    |
-| Notifications  | User notifications                         |
-| Sessions       | Manage active login sessions               |
+| Projects       | Create, update, search and manage projects             |
+| Collaboration  | Collaboration requests and members                     |
+| Conversations  | Create and fetch conversations                         |
+| Messages       | Send and receive messages                              |
+| Reviews        | Submit and view reviews                                |
+| Notifications  | User notifications                                     |
+| Sessions       | Manage active login sessions                           |
+| Skills         | Autocomplete search and skill creation                 |
 
 ---
 
@@ -126,37 +127,44 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 ## Users
 
-| Method | Endpoint             | Auth | Description                 | Notes              |
-| ------ | -------------------- | ---- | --------------------------- | ------------------ |
-| GET    | `/users/:publicId`   | No   | Get user profile            | Public endpoint    |
-| PATCH  | `/users/me`          | Yes  | Update profile              | Owner only         |
-| GET    | `/users/me/projects` | Yes  | Get current user's projects | Authenticated user |
-| GET    | `/users`             | No   | Search users                | Paginated response |
+| Method | Endpoint             | Auth | Description                 | Notes                                  |
+| ------ | -------------------- | ---- | --------------------------- | -------------------------------------- |
+| GET    | `/users/:publicId`   | No   | Get user profile            | Public endpoint                        |
+| PATCH  | `/users/me`          | Yes  | Update profile              | Owner only                             |
+| GET    | `/users/me/projects` | Yes  | Get current user's projects | Authenticated user                     |
+| POST   | `/users/search`      | No   | Search developers           | Structured filters, paginated response |
+
+## Skills
+
+| Method | Endpoint         | Auth | Description                     | Notes                                         |
+| ------ | ---------------- | ---- | ------------------------------- | --------------------------------------------- |
+| GET    | `/skills/search` | No   | Search skills                   | Autocomplete                                  |
+| POST   | `/skills`        | Yes  | Create or return existing skill | Returns existing skill if name already exists |
 
 ## Connections
 
-| Method | Endpoint | Auth | Description | Notes |
-| ------ | -------- | ---- | ----------- | ----- |
-| POST | `/connections/:publicId` | Yes | Send connection request | Authenticated user |
-| GET | `/connections/incoming` | Yes | List incoming requests | Authenticated user |
-| GET | `/connections/outgoing` | Yes | List outgoing requests | Authenticated user |
-| GET | `/connections` | Yes | List accepted connections | Authenticated user |
-| PATCH | `/connections/:publicId/accept` | Yes | Accept connection request | Recipient only |
-| PATCH | `/connections/:publicId/reject` | Yes | Reject connection request | Recipient only |
-| PATCH | `/connections/:publicId/cancel` | Yes | Cancel sent request | Sender only |
-| DELETE | `/connections/:publicId` | Yes | Remove connection | Either connected user |
+| Method | Endpoint                        | Auth | Description               | Notes                 |
+| ------ | ------------------------------- | ---- | ------------------------- | --------------------- |
+| POST   | `/connections/:publicId`        | Yes  | Send connection request   | Authenticated user    |
+| GET    | `/connections/incoming`         | Yes  | List incoming requests    | Authenticated user    |
+| GET    | `/connections/outgoing`         | Yes  | List outgoing requests    | Authenticated user    |
+| GET    | `/connections`                  | Yes  | List accepted connections | Authenticated user    |
+| PATCH  | `/connections/:publicId/accept` | Yes  | Accept connection request | Recipient only        |
+| PATCH  | `/connections/:publicId/reject` | Yes  | Reject connection request | Recipient only        |
+| PATCH  | `/connections/:publicId/cancel` | Yes  | Cancel sent request       | Sender only           |
+| DELETE | `/connections/:publicId`        | Yes  | Remove connection         | Either connected user |
 
 ## Projects
 
-| Method | Endpoint                                           | Auth | Description                | Notes                                                           |
-| ------ | -------------------------------------------------- | ---- | -------------------------- | --------------------------------------------------------------- |
-| POST   | `/projects`                                        | Yes  | Create project             | Authenticated user                                              |
-| GET    | `/projects`                                        | No   | List projects              | Supports pagination, search, status, visibility and tag filters |
-| GET    | `/projects/:publicId`                              | No   | Get project                | Public endpoint                                                 |
-| PATCH  | `/projects/:publicId`                              | Yes  | Update project             | Owner only                                                      |
-| DELETE | `/projects/:publicId`                              | Yes  | Delete project             | Owner only                                                      |
-| GET    | `/projects/:publicId/members`                      | No   | List project members       | Public project only                                             |
-| DELETE | `/projects/:projectPublicId/members/:userPublicId` | Yes  | Remove member from project | Owner only                                                      |
+| Method | Endpoint                                           | Auth | Description                | Notes                                  |
+| ------ | -------------------------------------------------- | ---- | -------------------------- | -------------------------------------- |
+| POST   | `/projects`                                        | Yes  | Create project             | Authenticated user                     |
+| POST   | `/projects/search`                                 | No   | Search projects            | Structured filters, paginated response |
+| GET    | `/projects/:publicId`                              | No   | Get project                | Public endpoint                        |
+| PATCH  | `/projects/:publicId`                              | Yes  | Update project             | Owner only                             |
+| DELETE | `/projects/:publicId`                              | Yes  | Delete project             | Owner only                             |
+| GET    | `/projects/:publicId/members`                      | No   | List project members       | Public project only                    |
+| DELETE | `/projects/:projectPublicId/members/:userPublicId` | Yes  | Remove member from project | Owner only                             |
 
 ## Collaboration
 
@@ -212,47 +220,66 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 # 5. Authorization
 
-| Resource/Action         | Access             |
-| ----------------------- | ------------------ |
-| Public Profiles         | Public             |
-| User Profile Update     | Owner              |
-| Send Connection Request   | Authenticated User |
+| Resource/Action           | Access               |
+| ------------------------- | -------------------- |
+| Public Profiles           | Public               |
+| User Profile Update       | Owner                |
+| Send Connection Request   | Authenticated User   |
 | Manage Connection Request | Request Participants |
-| Remove Connection         | Connected Users |
-| Project Update          | Owner              |
-| Project Delete          | Owner              |
-| Collaboration Request   | Authenticated User |
-| Sessions                | Authenticated User |
-| Accept / Reject Request | Project Owner      |
-| Messaging               | Project Members    |
-| Reviews                 | Collaborators      |
+| Remove Connection         | Connected Users      |
+| Project Update            | Owner                |
+| Project Delete            | Owner                |
+| Collaboration Request     | Authenticated User   |
+| Sessions                  | Authenticated User   |
+| Accept / Reject Request   | Project Owner        |
+| Messaging                 | Project Members      |
+| Reviews                   | Collaborators        |
 
 ---
 
-# 6. Standard Query Parameters
+# 6. Search Request Bodies
 
-- `page`: Page number for paginated results
-- `limit`: Number of results per page
-- `sort`: Sort order (e.g., `createdAt:desc`, `title:asc`, `rating:desc`)
-- `search`: Search string (where applicable)
-- `fields`: Comma-separated fields to include in the response (where supported)
+For complex search operations (developers, projects), the API uses POST endpoints with structured request bodies instead of query parameters.
 
-### Common Resource Filters
+- **Pagination:** Use `page` (page number) and `limit` (results per page) fields.
+- **Sort:** Use the `sort` field (e.g., `"best_match"`).
+- **Text Search:** Optionally include a `q` field for free-text queries.
+- **Filters:** Use structured filter objects—do not use comma-separated query parameters.
 
-**Users**
+**Example: Developer search request body**
 
-- username
-- skills
-- availability
-- experienceLevel
+```json
+{
+	"q": "shiv",
+	"skills": [
+		{
+			"skill": "SKL_xxxxx",
+			"level": "ADVANCED"
+		}
+	],
+	"developerType": "STUDENT",
+	"sort": "best_match",
+	"page": 1,
+	"limit": 10
+}
+```
 
-**Projects**
+**Example: Project search request body**
 
-- status
-- visibility
-- tags
-- owner
-- requiredSkills
+```json
+{
+	"q": "chat",
+	"requiredSkills": [
+		{
+			"skill": "SKL_xxxxx"
+		}
+	],
+	"status": "OPEN",
+	"sort": "best_match",
+	"page": 1,
+	"limit": 10
+}
+```
 
 ---
 
@@ -332,3 +359,5 @@ New Access Token
 - JWT authentication
 - HTTP status codes
 - Resource-based URLs
+- Complex search endpoints use POST with structured request bodies (not query params).
+- Public IDs are accepted by clients and resolved internally to MongoDB ObjectIds.

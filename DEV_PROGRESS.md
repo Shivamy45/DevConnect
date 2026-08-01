@@ -1,6 +1,6 @@
 # DevConnect Progress
 
-Last Updated: 2026-07-30
+Last Updated: 2026-08-02
 
 ---
 
@@ -22,13 +22,13 @@ At the end of every conversation:
 3. Update the "Next Tasks" section.
 
 ### Current Feature
-Authentication Completion & Backend Foundation
+Developer & Project Discovery
 
 ### Current Status
-- Authentication services are implemented: register, login, refresh token rotation, and logout.
-- Profile and avatar management is implemented.
-- Connection and project modules are partially implemented (core endpoints present, payloads in progress).
-- Frontend remains mostly scaffolded with placeholder UI and minimal integration.
+- Backend foundation is stable and standardized.
+- Authentication, profiles, connections, projects, skills and search are implemented.
+- API conventions and project documentation have been synchronized with the implementation.
+- Frontend development is the current focus.
 
 ---
 
@@ -38,24 +38,21 @@ Authentication Completion & Backend Foundation
 - **Authentication:** Register, Login, Refresh Tokens, Refresh Token Rotation, Logout, Secure Cookie Authentication, Authentication Middleware.
 - **User Module:** Current Profile, Public Profile by Username, Profile Update, Username Update, Avatar Upload, Default Avatar Generation, Cloudinary Integration.
 - **Connection Module:** Send, Accept, Reject, Cancel, Remove, Incoming, Outgoing, Connection services.
-- **Project Module:** Create, Get, Update, Delete.
-- **Core Architecture:** Controller→Service architecture, Global ApiError, Global Error Middleware, Express 5 async error handling, Zod validation middleware.
+- **Project Module:** Create, Get, Update, Delete, Search.
+- **Skill Module:** Skill creation, autocomplete search, publicId resolution.
+- **Search Module:** Developer search, Project search, Structured POST search APIs.
+- **Core Architecture:** Controller→Service architecture, standardized service returns, Global ApiError, Global Error Middleware, Express 5 async error handling, Zod validation middleware.
 - **Models:** User, Project, Connection, Skill.
 
 ### In Progress:
-- API response consistency.
-- Connection controller payloads.
-- Project validation improvements.
-- Frontend integration.
+- Frontend development and backend integration.
 
 ### Planned:
-- Search/discovery.
 - Collaboration requests.
 - Project members.
 - Messaging.
 - Notifications.
 - Reviews.
-- Skills management.
 
 ---
 
@@ -67,6 +64,9 @@ Authentication Completion & Backend Foundation
 - Default avatars are uploaded to Cloudinary.
 - Multi-device refresh token support.
 - High-growth data is stored in separate collections.
+- Complex search endpoints use POST with structured request bodies.
+- Skill publicIds are resolved to MongoDB ObjectIds in the service layer.
+- Skill creation is explicit through the Skill module; User and Project modules only reference existing skills.
 
 ### Development Workflow
 - Architecture, business rules, APIs, database design, validation rules, authorization, and feature planning are always designed before implementation.
@@ -80,23 +80,19 @@ Authentication Completion & Backend Foundation
 ---
 
 ## Next Tasks
-1. Fix remaining authentication polish (refresh cookie rotation verification, cookie security, automated tests).
-2. Standardize API response format.
-3. Return payloads from connection controllers.
-4. Add project listing/search/filtering.
-5. Build Skills APIs.
-6. Implement collaboration requests and project members.
-7. Connect frontend to backend.
-8. Add messaging and notifications.
+1. Design and implement Collaboration Requests.
+2. Build Project Members workflow.
+3. Connect frontend to backend.
+4. Implement messaging.
+5. Implement notifications.
+6. Implement reviews.
 
 ---
 
 ## Known Technical Debt
-- Docs and implementation have diverged.
 - No automated integration tests.
-- Frontend is mostly placeholder UI.
-- API response format is inconsistent.
-- Connection controllers omit returned data.
+- Frontend is still under active development.
+- Best-match search ranking is currently a placeholder.
 
 ---
 
@@ -106,10 +102,13 @@ Authentication Completion & Backend Foundation
 - Cloudinary rollback patterns.
 - Zod validation architecture.
 - Express 5 native async error handling.
+- Service standardization.
+- Structured search API design.
+- Skill publicId resolution.
 
 ---
 
 ## Session Notes
-- Authentication module is now considered feature-complete.
-- Repository review completed.
-- Next milestone: stabilize API contracts before implementing collaboration features.
+- Backend APIs for discovery are complete.
+- Project documentation has been updated to match the implementation.
+- Next milestone: Collaboration Requests.

@@ -3,14 +3,6 @@ import { publicIdValueSchema } from "./common.validation.js";
 
 const skillPublicIdSchema = publicIdValueSchema("SKL_", "skill");
 
-const commaSeparatedSchema = (itemSchema, fieldName) =>
-	z
-		.string()
-		.trim()
-		.min(1, `${fieldName} cannot be empty`)
-		.transform((value) => value.split(",").map((item) => item.trim()))
-		.pipe(z.array(itemSchema).min(1, `${fieldName} cannot be empty`));
-
 const visibilitySchema = z
 	.string()
 	.trim()
@@ -43,10 +35,7 @@ export const createProjectSchema = z.object({
 				.max(500, "Description cannot exceed 500 characters")
 				.optional(),
 			visibility: visibilitySchema.optional(),
-			requiredSkills: z
-				.array(skillPublicIdSchema)
-				.max(10)
-				.optional(),
+			requiredSkills: z.array(skillPublicIdSchema).max(10).optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
 			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
@@ -64,10 +53,7 @@ export const updateProjectSchema = z.object({
 				.max(500, "Description cannot exceed 500 characters")
 				.optional(),
 			visibility: visibilitySchema.optional(),
-			requiredSkills: z
-				.array(skillPublicIdSchema)
-				.max(10)
-				.optional(),
+			requiredSkills: z.array(skillPublicIdSchema).max(10).optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
 			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
@@ -77,13 +63,16 @@ export const updateProjectSchema = z.object({
 
 export const searchProjectsSchema = z
 	.object({
-		query: z
+		body: z
 			.object({
 				q: z.string().trim().min(1).max(40).optional(),
-				requiredSkills: commaSeparatedSchema(
-					skillPublicIdSchema,
-					"requiredSkills",
-				).optional(),
+				requiredSkills: z
+					.array(
+						z.object({
+							skill: skillPublicIdSchema,
+						}).strict(),
+					)
+					.optional(),
 				status: statusSchema.optional(),
 				sort: z
 					.enum(["best_match", "newest", "oldest"])

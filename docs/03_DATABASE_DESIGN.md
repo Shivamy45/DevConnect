@@ -1,10 +1,10 @@
 # DevConnect Database Design
 
-> Version: 1.0
+> Version: 1.1
 >
 > Status: Draft
 >
-> Last Updated: July 2026
+> Last Updated: August 2026
 
 ---
 
@@ -16,19 +16,19 @@ DevConnect uses MongoDB as its primary database. Data is organized into collecti
 
 # 2. Collections
 
-| Collection             | Purpose                          |
-| ---------------------- | -------------------------------- |
-| Users                  | Store user accounts and profiles |
+| Collection             | Purpose                                                      |
+| ---------------------- | ------------------------------------------------------------ |
+| Users                  | Store user accounts and profiles                             |
 | Connections            | Store developer connection requests and accepted connections |
-| Skills                 | List available skills            |
-| Projects               | Store project information        |
-| Collaboration Requests | Manage project join requests     |
-| Collaborations         | Track accepted collaborators     |
-| Conversations          | Chat conversations               |
-| Messages               | Conversation messages            |
-| Reviews                | Collaboration feedback           |
-| Notifications          | User notifications               |
-| Sessions               | Manage user sessions             |
+| Skills                 | List available skills                                        |
+| Projects               | Store project information                                    |
+| Collaboration Requests | Manage project join requests                                 |
+| Collaborations         | Track accepted collaborators                                 |
+| Conversations          | Chat conversations                                           |
+| Messages               | Conversation messages                                        |
+| Reviews                | Collaboration feedback                                       |
+| Notifications          | User notifications                                           |
+| Sessions               | Manage user sessions                                         |
 
 ---
 
@@ -63,30 +63,30 @@ Conversation
 
 ### Users
 
-| Field           | Type       | Notes            |
-| --------------- | ---------- | ---------------- |
-| publicId        | String     | Unique, Required |
-| username        | String     | Unique, Required |
-| email           | String     | Unique, Required |
-| password        | String     | Hashed, Required |
-| bio             | String     | Optional         |
-| githubUrl       | String     | Optional         |
-| experienceLevel | String     | Enum, Required   |
-| availability    | String     | Enum, Required   |
-| skills          | ObjectId[] | Ref[], Optional  |
-| createdAt       | Date       | Auto             |
-| updatedAt       | Date       | Auto             |
+| Field           | Type                                    | Notes                |
+| --------------- | --------------------------------------- | -------------------- |
+| publicId        | String                                  | Unique, Required     |
+| username        | String                                  | Unique, Required     |
+| email           | String                                  | Unique, Required     |
+| password        | String                                  | Hashed, Required     |
+| bio             | String                                  | Optional             |
+| githubUrl       | String                                  | Optional             |
+| experienceLevel | String                                  | Enum, Required       |
+| skills          | Array<{ skill: ObjectId, level: Enum }> | Ref(Skill), Optional |
+| wantToLearn     | Array<{ skill: ObjectId, level: Enum }> | Ref(Skill), Optional |
+| createdAt       | Date                                    | Auto                 |
+| updatedAt       | Date                                    | Auto                 |
 
 ### Connections
 
-| Field     | Type     | Notes            |
-| --------- | -------- | ---------------- |
-| publicId  | String   | Unique, Required |
+| Field     | Type     | Notes               |
+| --------- | -------- | ------------------- |
+| publicId  | String   | Unique, Required    |
 | sender    | ObjectId | Ref(User), Required |
 | receiver  | ObjectId | Ref(User), Required |
-| status    | String   | Enum, Required |
-| createdAt | Date     | Auto |
-| updatedAt | Date     | Auto |
+| status    | String   | Enum, Required      |
+| createdAt | Date     | Auto                |
+| updatedAt | Date     | Auto                |
 
 ### Sessions
 
@@ -106,26 +106,28 @@ Conversation
 
 ### Skills
 
-| Field    | Type   | Notes    |
-| -------- | ------ | -------- |
-| name     | String | Required |
-| category | String | Optional |
+| Field    | Type   | Notes            |
+| -------- | ------ | ---------------- |
+| publicId | String | Unique, Required |
+| name     | String | Required         |
+| category | String | Optional         |
+| icon     | String | Optional         |
 
 ### Projects
 
-| Field          | Type       | Notes            |
-| -------------- | ---------- | ---------------- |
-| publicId       | String     | Unique, Required |
-| owner          | ObjectId   | Ref, Required    |
-| title          | String     | Required         |
-| description    | String     | Required         |
-| requiredSkills | ObjectId[] | Ref[], Optional  |
-| maxMembers     | Number     | Required         |
-| visibility     | String     | Enum, Required   |
-| tags           | String[]   | Optional         |
-| status         | String     | Enum, Required   |
-| createdAt      | Date       | Auto             |
-| updatedAt      | Date       | Auto             |
+| Field          | Type       | Notes                  |
+| -------------- | ---------- | ---------------------- |
+| publicId       | String     | Unique, Required       |
+| owner          | ObjectId   | Ref, Required          |
+| title          | String     | Required               |
+| description    | String     | Required               |
+| requiredSkills | ObjectId[] | Ref(Skill)[], Optional |
+| maxMembers     | Number     | Required               |
+| visibility     | String     | Enum, Required         |
+| tags           | String[]   | Optional               |
+| status         | String     | Enum, Required         |
+| createdAt      | Date       | Auto                   |
+| updatedAt      | Date       | Auto                   |
 
 ### Collaboration Requests
 
@@ -193,8 +195,8 @@ Conversation
 | Collection             | Indexed Fields                                  |
 | ---------------------- | ----------------------------------------------- |
 | Users                  | username, email, publicId                       |
-| Connections           | sender + receiver (compound unique), status     |
-| Skills                 | name                                            |
+| Connections            | sender + receiver (compound unique), status     |
+| Skills                 | publicId, name                                  |
 | Projects               | owner, status, title (text), description (text) |
 | Collaboration Requests | project, sender (unique while pending), status  |
 | Collaborations         | project + user (unique), user                   |
@@ -213,7 +215,7 @@ Conversation
 | Projects   | title, description |
 | Skills     | name               |
 
-Text indexes are used for project titles and descriptions to support keyword search.
+Developer and project searches use structured POST request bodies. Skill filtering is performed using referenced Skill ObjectIds after resolving client-facing Skill publicIds in the service layer.
 
 ---
 
@@ -221,6 +223,8 @@ Text indexes are used for project titles and descriptions to support keyword sea
 
 - Every collection uses MongoDB ObjectIds internally for relationships.
 - User-facing resources expose nanoid-generated publicIds instead of MongoDB ObjectIds.
+- Skills are referenced internally by MongoDB ObjectIds while clients use Skill publicIds.
+- Service layers resolve publicIds before querying or persisting related documents.
 - References are preferred over deeply nested documents.
 - Automatic timestamps are enabled on all major collections.
 - Indexes are added for commonly queried fields.
@@ -238,7 +242,7 @@ Text indexes are used for project titles and descriptions to support keyword sea
 - **Collaboration.role**: Owner, Maintainer, Contributor
 - **Notification.type**: CollaborationRequest, RequestAccepted, RequestRejected, Message, Review
 - **ExperienceLevel**: Beginner, Intermediate, Advanced
-- **Availability**: Available, Busy, Not Looking
+- **Skill.level**: Beginner, Intermediate, Advanced
 
 ---
 

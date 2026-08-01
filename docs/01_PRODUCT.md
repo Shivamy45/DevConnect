@@ -1,10 +1,10 @@
 # DevConnect Product Document
 
-> Version: 1.0
+> Version: 1.1
 >
 > Status: Draft
 >
-> Last Updated: July 2026
+> Last Updated: August 2026
 
 ---
 
@@ -56,24 +56,26 @@ Create a platform where developers can build professional networks, discover mea
 | Collaboration         | Manage project collaboration requests and team members |
 | Messaging             | Communicate with teammates                  |
 | Reviews               | Leave feedback after collaboration          |
-| Search                | Find users and projects                     |
+| Discovery             | Search developers, projects and skills     |
 | Notifications         | Stay updated on important events            |
 
 ## Feature Status
 
-| Feature                    | Status |
-| -------------------------- | ------ |
-| Authentication             | MVP    |
-| User Profiles              | MVP    |
-| Developer Connections      | MVP    |
-| Projects                   | MVP    |
-| Collaboration Requests     | MVP    |
-| Messaging                  | MVP    |
-| Reviews                    | MVP    |
-| Notifications              | MVP    |
-| Project Search & Filtering | MVP    |
-| GitHub Integration         | Future |
-| AI Recommendations         | Future |
+| Feature                         | Status |
+| ------------------------------- | ------ |
+| Authentication                  | MVP    |
+| User Profiles                   | MVP    |
+| Developer Connections           | MVP    |
+| Projects                       | MVP    |
+| Collaboration Requests          | MVP    |
+| Messaging                      | MVP    |
+| Reviews                        | MVP    |
+| Notifications                  | MVP    |
+| Developer Search & Filtering   | MVP    |
+| Project Search & Filtering     | MVP    |
+| Skill Autocomplete & Management | MVP    |
+| GitHub Integration             | Future |
+| AI Recommendations             | Future |
 
 ---
 
@@ -107,22 +109,22 @@ Register / Login
 Complete Profile
    │
    ▼
-Discover Developers ────────────── Browse Projects
-   │                                   │
-   ▼                                   ▼
-Send Connection Request         Create Project
-   │                                   │
-   ▼                                   ▼
-Build Network             Receive Collaboration Requests
-                                           │
-                                           ▼
-                                  Build Project Team
-                                           │
-                                           ▼
-                                   Work Together
-                                           │
-                                           ▼
-                                     Leave Reviews
+Discover Developers & Skills ────────────── Discover Projects
+   │                                           │
+   ▼                                           ▼
+Send Connection Request                   Create Project
+   │                                           │
+   ▼                                           ▼
+Build Network                       Receive Collaboration Requests
+                                               │
+                                               ▼
+                                      Build Project Team
+                                               │
+                                               ▼
+                                       Work Together
+                                               │
+                                               ▼
+                                         Leave Reviews
 ```
 
 ---
@@ -149,7 +151,9 @@ Build Network             Receive Collaboration Requests
 - Direct messaging
 - Reviews
 - Notifications
-- Search and filtering
+- Developer search
+- Project search
+- Skill autocomplete and management
 - Public and private projects
 
 ### Planned for Future
@@ -176,7 +180,9 @@ The project is considered successful when users can:
 - Communicate with collaborators.
 - Complete collaborations.
 - Exchange reviews after project completion.
-- Discover relevant developers and projects using search and filtering.
+- Discover relevant developers using structured search.
+- Discover projects using structured search and skill filters.
+- Manage skills through autocomplete and explicit skill creation.
 
 ---
 

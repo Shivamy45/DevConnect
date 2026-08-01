@@ -16,7 +16,7 @@ import {
 import { publicIdParamSchema } from "../validations/common.validation.js";
 const router = Router();
 
-router.get(
+router.post(
 	"/search",
 	validate(searchProjectsSchema),
 	searchProjectsController,

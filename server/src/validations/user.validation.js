@@ -3,14 +3,6 @@ import { publicIdValueSchema } from "./common.validation.js";
 
 const skillPublicIdSchema = publicIdValueSchema("SKL_", "skill");
 
-const commaSeparatedSchema = (itemSchema, fieldName) =>
-	z
-		.string()
-		.trim()
-		.min(1, `${fieldName} cannot be empty`)
-		.transform((value) => value.split(",").map((item) => item.trim()))
-		.pipe(z.array(itemSchema).min(1, `${fieldName} cannot be empty`));
-
 const pageSchema = z.coerce.number().int().min(1).default(1);
 const limitSchema = z.coerce.number().int().min(1).max(50).default(10);
 
@@ -18,15 +10,15 @@ const skillLevelSchema = z
 	.string()
 	.trim()
 	.toUpperCase()
-	.pipe(z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]));
+	.pipe(
+		z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "ANY"]).default("ANY"),
+	);
 
 const developerTypeSchema = z
 	.string()
 	.trim()
 	.toUpperCase()
-	.pipe(
-		z.enum(["STUDENT", "PROFESSIONAL", "FREELANCER", "SELF_TAUGHT"]),
-	);
+	.pipe(z.enum(["STUDENT", "PROFESSIONAL", "FREELANCER", "SELF_TAUGHT"]));
 
 export const updateProfileSchema = z
 	.object({
@@ -126,17 +118,17 @@ export const updateUsernameSchema = z
 
 export const searchUsersSchema = z
 	.object({
-		query: z
+		body: z
 			.object({
 				q: z.string().trim().min(1).max(50).optional(),
-				skills: commaSeparatedSchema(
-					skillPublicIdSchema,
-					"skills",
-				).optional(),
-				levels: commaSeparatedSchema(
-					z.literal("").or(skillLevelSchema),
-					"levels",
-				).optional(),
+				skills: z
+					.array(
+						z.object({
+							skill: skillPublicIdSchema,
+							level: skillLevelSchema.default("ANY"),
+						}).strict(),
+					)
+					.optional(),
 				developerType: developerTypeSchema.optional(),
 				sort: z
 					.enum(["best_match", "username_asc", "username_desc"])
@@ -144,15 +136,6 @@ export const searchUsersSchema = z
 				page: pageSchema,
 				limit: limitSchema,
 			})
-			.strict()
-			.refine(
-				(query) =>
-					!query.levels ||
-					(query.skills && query.levels.length <= query.skills.length),
-				{
-					path: ["levels"],
-					message: "Levels must correspond to selected skills",
-				},
-			),
+			.strict(),
 	})
 	.strict();

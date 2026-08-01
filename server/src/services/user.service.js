@@ -20,6 +20,12 @@ const formatSkill = (skillDetails) => {
 	};
 };
 
+const sortOptions = {
+	best_match: { username: 1 },
+	username_asc: { username: 1 },
+	username_desc: { username: -1 },
+};
+
 const formatPublicUser = (user) => ({
 	publicId: user.publicId,
 	username: user.username,
@@ -32,26 +38,6 @@ const formatPublicUser = (user) => ({
 	wantToLearn: user.wantToLearn?.map(formatSkill).filter(Boolean) ?? [],
 	developerType: user.developerType,
 });
-
-const resolveSkillPublicIds = async (publicIds) => {
-	if (!publicIds?.length) return [];
-
-	const uniquePublicIds = [...new Set(publicIds)];
-	const skills = await skillModel
-		.find({ publicId: { $in: uniquePublicIds } })
-		.select("_id publicId")
-		.lean();
-
-	if (skills.length !== uniquePublicIds.length) {
-		throw new ApiError(400, "Skill not found");
-	}
-
-	const skillIdByPublicId = new Map(
-		skills.map((skill) => [skill.publicId, skill._id]),
-	);
-
-	return publicIds.map((publicId) => skillIdByPublicId.get(publicId));
-};
 
 export const getProfile = async (publicId) => {
 	const user = await userModel
@@ -202,7 +188,6 @@ export const getUserName = async (publicId) => {
 export const listUsersBySearch = async ({
 	q,
 	skills,
-	levels,
 	developerType,
 	sort,
 	page,
@@ -220,10 +205,10 @@ export const listUsersBySearch = async ({
 	}
 
 	if (skills?.length) {
-		const skillObjectIds = await resolveSkillPublicIds(skills);
-		filter.$and = skillObjectIds.map((skillId, index) => {
-			const skillFilter = { skill: skillId };
-			if (levels?.[index]) skillFilter.level = levels[index];
+		const resolvedSkills = await resolveSkills(skills);
+		filter.$and = resolvedSkills.map(({ skill, level }) => {
+			const skillFilter = { skill };
+			if (level !== "ANY") skillFilter.level = level;
 
 			return {
 				skills: {
@@ -233,11 +218,6 @@ export const listUsersBySearch = async ({
 		});
 	}
 
-	const sortOptions = {
-		best_match: { username: 1 },
-		username_asc: { username: 1 },
-		username_desc: { username: -1 },
-	};
 	const skip = (page - 1) * limit;
 
 	const query = userModel

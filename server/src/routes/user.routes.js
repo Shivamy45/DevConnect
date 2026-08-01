@@ -21,7 +21,7 @@ import validateAvatarUpload from "../middlewares/avatar.middleware.js";
 
 const router = Router();
 
-router.get("/search", validate(searchUsersSchema), searchUsersController);
+router.post("/search", validate(searchUsersSchema), searchUsersController);
 
 router.get("/me", authenticateUser, getProfileController);
 
