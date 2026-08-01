@@ -1,5 +1,32 @@
 import { z } from "zod";
-import { objectIdSchema } from "./common.validation.js";
+import { publicIdValueSchema } from "./common.validation.js";
+
+const skillPublicIdSchema = publicIdValueSchema("SKL_", "skill");
+
+const commaSeparatedSchema = (itemSchema, fieldName) =>
+	z
+		.string()
+		.trim()
+		.min(1, `${fieldName} cannot be empty`)
+		.transform((value) => value.split(",").map((item) => item.trim()))
+		.pipe(z.array(itemSchema).min(1, `${fieldName} cannot be empty`));
+
+const pageSchema = z.coerce.number().int().min(1).default(1);
+const limitSchema = z.coerce.number().int().min(1).max(50).default(10);
+
+const skillLevelSchema = z
+	.string()
+	.trim()
+	.toUpperCase()
+	.pipe(z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]));
+
+const developerTypeSchema = z
+	.string()
+	.trim()
+	.toUpperCase()
+	.pipe(
+		z.enum(["STUDENT", "PROFESSIONAL", "FREELANCER", "SELF_TAUGHT"]),
+	);
 
 export const updateProfileSchema = z
 	.object({
@@ -22,12 +49,7 @@ export const updateProfileSchema = z
 					.optional(),
 				education: z
 					.object({
-						college: z
-							.string()
-							.trim()
-							.min(2)
-							.max(100)
-							.optional(),
+						college: z.string().trim().min(2).max(100).optional(),
 						fieldOfStudy: z
 							.string()
 							.trim()
@@ -46,11 +68,7 @@ export const updateProfileSchema = z
 					.array(
 						z
 							.object({
-								name: z
-									.string()
-									.trim()
-									.min(1)
-									.max(50),
+								name: z.string().trim().min(1).max(50),
 								url: z
 									.string()
 									.trim()
@@ -64,12 +82,8 @@ export const updateProfileSchema = z
 					.array(
 						z
 							.object({
-								skill: objectIdSchema,
-								level: z.enum([
-									"BEGINNER",
-									"INTERMEDIATE",
-									"ADVANCED",
-								]),
+								skill: skillPublicIdSchema,
+								level: skillLevelSchema,
 							})
 							.strict(),
 					)
@@ -79,25 +93,14 @@ export const updateProfileSchema = z
 					.array(
 						z
 							.object({
-								skill: objectIdSchema,
-								level: z.enum([
-									"BEGINNER",
-									"INTERMEDIATE",
-									"ADVANCED",
-								]),
+								skill: skillPublicIdSchema,
+								level: skillLevelSchema,
 							})
 							.strict(),
 					)
 					.max(30)
 					.optional(),
-				developerType: z
-					.enum([
-						"STUDENT",
-						"PROFESSIONAL",
-						"FREELANCER",
-						"SELF_TAUGHT",
-					])
-					.optional(),
+				developerType: developerTypeSchema.optional(),
 			})
 			.strict(),
 	})
@@ -118,5 +121,38 @@ export const updateUsernameSchema = z
 					.max(20, "Username cannot exceed 20 characters"),
 			})
 			.strict(),
+	})
+	.strict();
+
+export const searchUsersSchema = z
+	.object({
+		query: z
+			.object({
+				q: z.string().trim().min(1).max(50).optional(),
+				skills: commaSeparatedSchema(
+					skillPublicIdSchema,
+					"skills",
+				).optional(),
+				levels: commaSeparatedSchema(
+					z.literal("").or(skillLevelSchema),
+					"levels",
+				).optional(),
+				developerType: developerTypeSchema.optional(),
+				sort: z
+					.enum(["best_match", "username_asc", "username_desc"])
+					.default("best_match"),
+				page: pageSchema,
+				limit: limitSchema,
+			})
+			.strict()
+			.refine(
+				(query) =>
+					!query.levels ||
+					(query.skills && query.levels.length <= query.skills.length),
+				{
+					path: ["levels"],
+					message: "Levels must correspond to selected skills",
+				},
+			),
 	})
 	.strict();

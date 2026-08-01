@@ -4,6 +4,7 @@ import authenticateUser from "../middlewares/auth.middleware.js";
 import {
 	updateProfileSchema,
 	updateUsernameSchema,
+	searchUsersSchema,
 } from "../validations/user.validation.js";
 
 import {
@@ -13,11 +14,14 @@ import {
 	getUserProfileController,
 	updateAvatarController,
 	generateAvatarController,
+	searchUsersController,
 } from "../controllers/user.controller.js";
 import validate from "../middlewares/validation.middleware.js";
 import validateAvatarUpload from "../middlewares/avatar.middleware.js";
 
 const router = Router();
+
+router.get("/search", validate(searchUsersSchema), searchUsersController);
 
 router.get("/me", authenticateUser, getProfileController);
 
@@ -27,7 +31,12 @@ router.patch(
 	validate(updateProfileSchema),
 	updateProfileController,
 );
-router.patch("/me/avatar", authenticateUser, validateAvatarUpload, updateAvatarController);
+router.patch(
+	"/me/avatar",
+	authenticateUser,
+	validateAvatarUpload,
+	updateAvatarController,
+);
 
 router.patch("/me/avatar/default", authenticateUser, generateAvatarController);
 
@@ -39,6 +48,5 @@ router.patch(
 );
 
 router.get("/:username", getUserProfileController);
-
 
 export default router;

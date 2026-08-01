@@ -9,6 +9,7 @@ import {
 	updateAvatar,
 	updateUsername,
 	getUserName,
+	listUsersBySearch,
 } from "../services/user.service.js";
 
 export const getProfileController = async (req, res) => {
@@ -88,6 +89,19 @@ export const updateUsernameController = async (req, res) => {
 		message: "Username changed successfully",
 		data: {
 			user: result.user,
+		},
+	});
+};
+
+export const searchUsersController = async (req, res) => {
+	const result = await listUsersBySearch(req.query);
+
+	res.status(200).json({
+		success: true,
+		message: "Users fetched successfully",
+		data: {
+			users: result.users,
+			pagination: result.pagination,
 		},
 	});
 };

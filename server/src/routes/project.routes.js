@@ -3,15 +3,24 @@ import {
 	createProjectController,
 	deleteProjectController,
 	getProjectController,
+	searchProjectsController,
 	updateProjectController,
 } from "../controllers/project.controller.js";
 import authenticateUser from "../middlewares/auth.middleware.js";
 import validate from "../middlewares/validation.middleware.js";
 import {
 	createProjectSchema,
+	searchProjectsSchema,
 	updateProjectSchema,
 } from "../validations/project.validation.js";
+import { publicIdParamSchema } from "../validations/common.validation.js";
 const router = Router();
+
+router.get(
+	"/search",
+	validate(searchProjectsSchema),
+	searchProjectsController,
+);
 
 router.post(
 	"/",

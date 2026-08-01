@@ -3,6 +3,7 @@ import {
 	updateProject,
 	getProjectByPublicId,
 	deleteProject,
+	listProjectsBySearch,
 } from "../services/project.service.js";
 
 export const getProjectController = async (req, res) => {
@@ -49,5 +50,18 @@ export const deleteProjectController = async (req, res) => {
 		success: true,
 		message: "Project deleted successfully",
 		data: null,
+	});
+};
+
+export const searchProjectsController = async (req, res) => {
+	const result = await listProjectsBySearch(req.query);
+
+	res.status(200).json({
+		success: true,
+		message: "Projects fetched successfully",
+		data: {
+			projects: result.projects,
+			pagination: result.pagination,
+		},
 	});
 };

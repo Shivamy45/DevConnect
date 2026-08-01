@@ -1,5 +1,15 @@
 import { z } from "zod";
-import { objectIdSchema } from "./common.validation.js";
+import { publicIdValueSchema } from "./common.validation.js";
+
+const skillPublicIdSchema = publicIdValueSchema("SKL_", "skill");
+
+const commaSeparatedSchema = (itemSchema, fieldName) =>
+	z
+		.string()
+		.trim()
+		.min(1, `${fieldName} cannot be empty`)
+		.transform((value) => value.split(",").map((item) => item.trim()))
+		.pipe(z.array(itemSchema).min(1, `${fieldName} cannot be empty`));
 
 const visibilitySchema = z
 	.string()
@@ -12,6 +22,9 @@ const statusSchema = z
 	.trim()
 	.toUpperCase()
 	.pipe(z.enum(["OPEN", "IN_PROGRESS", "COMPLETED"]));
+
+const pageSchema = z.coerce.number().int().min(1).default(1);
+const limitSchema = z.coerce.number().int().min(1).max(50).default(10);
 
 const externalLinkSchema = z
 	.object({
@@ -30,7 +43,10 @@ export const createProjectSchema = z.object({
 				.max(500, "Description cannot exceed 500 characters")
 				.optional(),
 			visibility: visibilitySchema.optional(),
-			requiredSkills: z.array(objectIdSchema).max(10).optional(),
+			requiredSkills: z
+				.array(skillPublicIdSchema)
+				.max(10)
+				.optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
 			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
@@ -48,10 +64,33 @@ export const updateProjectSchema = z.object({
 				.max(500, "Description cannot exceed 500 characters")
 				.optional(),
 			visibility: visibilitySchema.optional(),
-			requiredSkills: z.array(objectIdSchema).max(10).optional(),
+			requiredSkills: z
+				.array(skillPublicIdSchema)
+				.max(10)
+				.optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
 			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
 		})
 		.strict(),
 });
+
+export const searchProjectsSchema = z
+	.object({
+		query: z
+			.object({
+				q: z.string().trim().min(1).max(40).optional(),
+				requiredSkills: commaSeparatedSchema(
+					skillPublicIdSchema,
+					"requiredSkills",
+				).optional(),
+				status: statusSchema.optional(),
+				sort: z
+					.enum(["best_match", "newest", "oldest"])
+					.default("best_match"),
+				page: pageSchema,
+				limit: limitSchema,
+			})
+			.strict(),
+	})
+	.strict();
