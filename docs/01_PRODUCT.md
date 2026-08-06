@@ -47,35 +47,36 @@ Create a platform where developers can build professional networks, discover mea
 
 # 5. Core Features
 
-| Module                | Description                                 |
-| --------------------- | ------------------------------------------- |
-| Authentication        | Secure user accounts                        |
-| Profiles              | Showcase skills and experience              |
-| Developer Connections | Build and manage professional connections   |
-| Projects              | Create and manage projects                  |
+| Module                | Description                                            |
+| --------------------- | ------------------------------------------------------ |
+| Authentication        | Secure user accounts                                   |
+| Profiles              | Showcase skills and experience                         |
+| Developer Connections | Build and manage professional connections              |
+| Projects              | Create and manage projects                             |
 | Collaboration         | Manage project collaboration requests and team members |
-| Messaging             | Communicate with teammates                  |
-| Reviews               | Leave feedback after collaboration          |
-| Discovery             | Search developers, projects and skills     |
-| Notifications         | Stay updated on important events            |
+| Messaging             | Communicate with teammates                             |
+| Reviews               | Leave feedback after collaboration                     |
+| Discovery             | Search and discover developers, projects, and skills.  |
+| Notifications         | Stay updated on important events                       |
 
 ## Feature Status
 
-| Feature                         | Status |
-| ------------------------------- | ------ |
-| Authentication                  | MVP    |
-| User Profiles                   | MVP    |
-| Developer Connections           | MVP    |
-| Projects                       | MVP    |
+| Feature                         | Status      |
+| ------------------------------- | ----------- |
+| Authentication                  | Implemented |
+| User Profiles                   | Implemented |
+| Developer Connections           | Implemented |
+| Projects                        | Implemented |
 | Collaboration Requests          | Implemented |
-| Messaging                      | MVP    |
-| Reviews                        | MVP    |
-| Notifications                  | MVP    |
-| Developer Search & Filtering   | MVP    |
-| Project Search & Filtering     | MVP    |
-| Skill Autocomplete & Management | MVP    |
-| GitHub Integration             | Future |
-| AI Recommendations             | Future |
+| Project Members Management      | Implemented |
+| Messaging                       | Planned     |
+| Reviews                         | Planned     |
+| Notifications                   | Planned     |
+| Developer Search & Filtering    | Implemented |
+| Project Search & Filtering      | Implemented |
+| Skill Autocomplete & Management | Implemented |
+| GitHub Integration              | Future      |
+| AI Recommendations              | Future      |
 
 ---
 
@@ -94,9 +95,6 @@ In Progress
   │
   ▼
 Completed
-  │
-  ▼
-Archived
 ```
 
 ```text
@@ -131,11 +129,11 @@ Build Network                       Receive Collaboration Requests
 
 # 7. User Roles & Permissions
 
-| Role          | Permissions                                           |
-| ------------- | ----------------------------------------------------- |
-| Guest         | Browse public content, register, log in               |
-| User          | Manage profile, create projects, collaborate, message |
-| Project Owner | Manage project, review requests, remove collaborators |
+| Role          | Permissions                                                                 |
+| ------------- | --------------------------------------------------------------------------- |
+| Guest         | Browse public content, register, log in                                     |
+| User          | Manage profile, create projects, collaborate, message                       |
+| Project Owner | Manage project, collaboration requests, team members, and project lifecycle |
 
 ---
 

@@ -1,9 +1,25 @@
 import projectModel from "../models/project.model.js";
+import userModel from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { nanoid } from "nanoid";
 import { resolveSkills } from "./skill.service.js";
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const getTeamSize = (project) => project.members.length + 1;
+
+export const recalculateProjectStatus = (project) => {
+	if (project.status === "COMPLETED") {
+		return;
+	}
+
+	const teamSize = getTeamSize(project);
+	if (teamSize >= project.maxMembers) {
+		project.status = "IN_PROGRESS";
+	} else {
+		project.status = "OPEN";
+	}
+};
 
 const formatSkill = (skill) => ({
 	publicId: skill.publicId,
@@ -96,9 +112,124 @@ export const updateProject = async (
 	if (!project.owner.equals(userId)) {
 		throw new ApiError(403, "You are not authorized for this operation");
 	}
+	if (project.status === "COMPLETED") {
+		if (
+			projectDetails.maxMembers !== undefined ||
+			projectDetails.requiredSkills !== undefined
+		) {
+			throw new ApiError(
+				400,
+				"Cannot modify recruitment settings of a completed project",
+			);
+		}
+	}
+	if (projectDetails.maxMembers !== undefined) {
+		const teamSize = getTeamSize(project);
+		if (projectDetails.maxMembers < teamSize) {
+			throw new ApiError(
+				400,
+				"maxMembers cannot be less than current team size",
+			);
+		}
+	}
 	for (const [key, value] of Object.entries(projectDetails)) {
 		if (value !== undefined) project[key] = value;
 	}
+	recalculateProjectStatus(project);
+	await project.save();
+	return {
+		project,
+	};
+};
+
+export const leaveProject = async (userId, projectPublicId) => {
+	const project = await projectModel.findOne({
+		publicId: projectPublicId,
+	});
+	if (!project) {
+		throw new ApiError(404, "Project not found");
+	}
+	if (project.status === "COMPLETED") {
+		throw new ApiError(400, "Cannot leave a completed project");
+	}
+	if (project.owner.equals(userId)) {
+		throw new ApiError(400, "Project owner cannot leave the project");
+	}
+	const memberIndex = project.members.findIndex((member) =>
+		member.userId.equals(userId),
+	);
+	if (memberIndex === -1) {
+		throw new ApiError(403, "You are not a member of this project");
+	}
+	project.members.splice(memberIndex, 1);
+	recalculateProjectStatus(project);
+	await project.save();
+	return {
+		project,
+	};
+};
+
+export const removeProjectMember = async (
+	ownerId,
+	projectPublicId,
+	username,
+) => {
+	const project = await projectModel.findOne({
+		publicId: projectPublicId,
+	});
+	if (!project) {
+		throw new ApiError(404, "Project not found");
+	}
+	if (!project.owner.equals(ownerId)) {
+		throw new ApiError(403, "You are not authorized for this operation");
+	}
+	if (project.status === "COMPLETED") {
+		throw new ApiError(
+			400,
+			"Cannot remove members from a completed project",
+		);
+	}
+	const user = await userModel.findOne({ username });
+	if (!user) {
+		throw new ApiError(404, "User not found");
+	}
+	if (project.owner.equals(user._id)) {
+		throw new ApiError(400, "Project owner cannot be removed");
+	}
+	const memberIndex = project.members.findIndex((member) =>
+		member.userId.equals(user._id),
+	);
+	if (memberIndex === -1) {
+		throw new ApiError(404, "User is not a member of this project");
+	}
+	project.members.splice(memberIndex, 1);
+	recalculateProjectStatus(project);
+	await project.save();
+	return {
+		project,
+	};
+};
+
+export const updateProjectStatus = async (ownerId, projectPublicId, status) => {
+	const project = await projectModel.findOne({
+		publicId: projectPublicId,
+	});
+	if (!project) {
+		throw new ApiError(404, "Project not found");
+	}
+	if (!project.owner.equals(ownerId)) {
+		throw new ApiError(403, "You are not authorized for this operation");
+	}
+	if (status !== "COMPLETED") {
+		throw new ApiError(400, "Only project completion is supported");
+	}
+	if (project.status !== "IN_PROGRESS") {
+		throw new ApiError(
+			400,
+			"Project must be in progress before it can be completed",
+		);
+	}
+	project.status = "COMPLETED";
 	await project.save();
 	return {
 		project,

@@ -10,7 +10,7 @@
 
 # 1. Overview
 
-The DevConnect backend exposes a REST API that enables user authentication, developer networking, profile management, project management, collaboration, messaging, reviews, notifications, and session management. All endpoints exchange JSON data over HTTPS.
+The DevConnect backend exposes a REST API for user authentication, developer networking, profile management, skill management, project management, collaboration requests, and project member management. Future modules include messaging, reviews, notifications, and session management.
 
 ---
 
@@ -23,7 +23,7 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 | Protocol       | HTTPS            |
 | Format         | JSON             |
 | Authentication | JWT Access Token |
-| Base URL       | `/api/v1`        |
+| Base URL       | `/api/`          |
 | Time Format    | ISO 8601         |
 
 | CRUD Operation     | HTTP Method |
@@ -102,14 +102,14 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 | Authentication | Register, login, logout, refresh token                 |
 | Users          | Profile, skills, account management                    |
 | Connections    | Developer connection requests and professional network |
+| Skills         | Autocomplete search and skill creation                 |
 | Projects       | Create, update, search and manage projects             |
-| Collaboration  | Collaboration requests and members                     |
+| Collaboration  | Collaboration requests between developers and projects |
 | Conversations  | Create and fetch conversations                         |
 | Messages       | Send and receive messages                              |
 | Reviews        | Submit and view reviews                                |
 | Notifications  | User notifications                                     |
 | Sessions       | Manage active login sessions                           |
-| Skills         | Autocomplete search and skill creation                 |
 
 ---
 
@@ -156,29 +156,31 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 ## Projects
 
-| Method | Endpoint                                           | Auth | Description                | Notes                                  |
-| ------ | -------------------------------------------------- | ---- | -------------------------- | -------------------------------------- |
-| POST   | `/projects`                                        | Yes  | Create project             | Authenticated user                     |
-| POST   | `/projects/search`                                 | No   | Search projects            | Structured filters, paginated response |
-| GET    | `/projects/:publicId`                              | No   | Get project                | Public endpoint                        |
-| PATCH  | `/projects/:publicId`                              | Yes  | Update project             | Owner only                             |
-| DELETE | `/projects/:publicId`                              | Yes  | Delete project             | Owner only                             |
-| GET    | `/projects/:publicId/members`                      | No   | List project members       | Public project only                    |
-| DELETE | `/projects/:projectPublicId/members/:userPublicId` | Yes  | Remove member from project | Owner only                             |
+| Method | Endpoint                                | Auth | Description                | Notes                                  |
+| ------ | --------------------------------------- | ---- | -------------------------- | -------------------------------------- |
+| POST   | `/projects`                             | Yes  | Create project             | Authenticated user                     |
+| POST   | `/projects/search`                      | No   | Search projects            | Structured filters, paginated response |
+| GET    | `/projects/:publicId`                   | No   | Get project                | Public endpoint                        |
+| PATCH  | `/projects/:publicId`                   | Yes  | Update project             | Owner only                             |
+| DELETE | `/projects/:publicId`                   | Yes  | Delete project             | Owner only                             |
+| PATCH  | `/projects/:publicId/status`            | Yes  | Mark project as completed  | Owner only; requires IN_PROGRESS       |
+| DELETE | `/projects/:publicId/members/me`        | Yes  | Leave project              | Project member only                    |
+| DELETE | `/projects/:publicId/members/:username` | Yes  | Remove member from project | Owner only                             |
+| GET    | `/projects/:publicId/members`           | No   | List project members       | Public endpoint                        |
 
 ## Collaboration
 
-| Method | Endpoint                                              | Auth | Description                          | Notes                              |
-| ------ | ----------------------------------------------------- | ---- | ------------------------------------ | ---------------------------------- |
-| POST   | `/collaboration-requests/apply`                       | Yes  | Apply to join a project              | Authenticated developer            |
-| POST   | `/collaboration-requests/invite`                      | Yes  | Invite a developer to a project      | Project owner only                 |
-| GET    | `/collaboration-requests/applications/outgoing`       | Yes  | List my outgoing applications        | Authenticated developer            |
-| GET    | `/collaboration-requests/applications/incoming`       | Yes  | List incoming applications           | Project owner only                 |
-| GET    | `/collaboration-requests/invitations/incoming`        | Yes  | List incoming invitations            | Authenticated developer            |
-| GET    | `/collaboration-requests/invitations/outgoing`        | Yes  | List outgoing invitations            | Project owner only                 |
-| PATCH  | `/collaboration-requests/:publicId/accept`            | Yes  | Accept a collaboration request       | Request receiver only              |
-| PATCH  | `/collaboration-requests/:publicId/reject`            | Yes  | Reject a collaboration request       | Request receiver only              |
-| PATCH  | `/collaboration-requests/:publicId/cancel`            | Yes  | Cancel a pending request             | Applicant (application) or owner (invitation) |
+| Method | Endpoint                                        | Auth | Description                     | Notes                                         |
+| ------ | ----------------------------------------------- | ---- | ------------------------------- | --------------------------------------------- |
+| POST   | `/collaboration-requests/apply`                 | Yes  | Apply to join a project         | Authenticated developer                       |
+| POST   | `/collaboration-requests/invite`                | Yes  | Invite a developer to a project | Project owner only                            |
+| GET    | `/collaboration-requests/applications/outgoing` | Yes  | List my outgoing applications   | Authenticated developer                       |
+| GET    | `/collaboration-requests/applications/incoming` | Yes  | List incoming applications      | Project owner only                            |
+| GET    | `/collaboration-requests/invitations/incoming`  | Yes  | List incoming invitations       | Authenticated developer                       |
+| GET    | `/collaboration-requests/invitations/outgoing`  | Yes  | List outgoing invitations       | Project owner only                            |
+| PATCH  | `/collaboration-requests/:publicId/accept`      | Yes  | Accept a collaboration request  | Request receiver only                         |
+| PATCH  | `/collaboration-requests/:publicId/reject`      | Yes  | Reject a collaboration request  | Request receiver only                         |
+| PATCH  | `/collaboration-requests/:publicId/cancel`      | Yes  | Cancel a pending request        | Applicant (application) or owner (invitation) |
 
 ## Conversations
 
@@ -223,28 +225,32 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 # 5. Authorization
 
-| Resource/Action           | Access               |
-| ------------------------- | -------------------- |
-| Public Profiles           | Public               |
-| User Profile Update       | Owner                |
-| Send Connection Request   | Authenticated User   |
-| Manage Connection Request | Request Participants |
-| Remove Connection         | Connected Users      |
-| Project Update            | Owner                |
-| Project Delete            | Owner                |
-| Collaboration Request     | Authenticated User   |
-| Sessions                  | Authenticated User   |
-| Accept / Reject Request   | Request Receiver     |
-| Cancel Application        | Applicant            |
-| Cancel Invitation         | Project Owner        |
-| Messaging                 | Project Members      |
-| Reviews                   | Collaborators        |
+| Resource/Action           | Access                 |
+| ------------------------- | ---------------------- |
+| Public Profiles           | Public                 |
+| User Profile Update       | Owner                  |
+| Send Connection Request   | Authenticated User     |
+| Manage Connection Request | Request Participants   |
+| Remove Connection         | Connected Users        |
+| Project Update            | Owner                  |
+| Project Delete            | Owner                  |
+| Complete Project          | Owner                  |
+| Leave Project             | Project Member         |
+| Remove Project Member     | Owner                  |
+| Project Members           | Owner / Project Member |
+| Collaboration Request     | Authenticated User     |
+| Sessions                  | Authenticated User     |
+| Accept / Reject Request   | Request Receiver       |
+| Cancel Application        | Applicant              |
+| Cancel Invitation         | Project Owner          |
+| Messaging                 | Project Members        |
+| Reviews                   | Collaborators          |
 
 ---
 
 # 6. Search Request Bodies
 
-For complex search operations (developers, projects), the API uses POST endpoints with structured request bodies instead of query parameters.
+Developer and project search endpoints use POST requests with structured JSON request bodies instead of query parameters.
 
 - **Pagination:** Use `page` (page number) and `limit` (results per page) fields.
 - **Sort:** Use the `sort` field (e.g., `"best_match"`).
@@ -342,7 +348,7 @@ New Access Token
 
 # 9. Versioning
 
-- **Base URL:** `/api/v1`
+- **Base URL:** `/api/`
 - Breaking API changes will be introduced through versioned endpoints (e.g., `/api/v2`).
 
 ---

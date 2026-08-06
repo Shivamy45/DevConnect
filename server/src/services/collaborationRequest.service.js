@@ -1,6 +1,7 @@
 import collaborationRequestModel from "../models/collaborationRequest.model.js";
 import projectModel from "../models/project.model.js";
 import userModel from "../models/user.model.js";
+import { recalculateProjectStatus } from "./project.service.js";
 import ApiError from "../utils/ApiError.js";
 import { nanoid } from "nanoid";
 
@@ -235,6 +236,7 @@ export const updateCollaborationRequestAccepted = async (
 	}
 
 	project.members.push({ userId: memberUserId });
+	recalculateProjectStatus(project);
 	await project.save();
 
 	request.status = "ACCEPTED";

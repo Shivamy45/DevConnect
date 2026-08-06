@@ -7,56 +7,68 @@ Last Updated: 2026-08-07
 ## Current Stage
 
 ### Project
+
 DevConnect Backend
 
 ## Purpose
+
 This file is the single source of truth for the current state of the DevConnect project.
 
 At the start of every new ChatGPT conversation:
+
 1. Upload this file.
 2. Ask ChatGPT to read it before continuing.
 
 At the end of every conversation:
+
 1. Update this file with completed work.
 2. Record any new architectural decisions.
 3. Update the "Next Tasks" section.
 
 ### Current Feature
-Collaboration Requests
+
+Frontend Development & Backend Integration
 
 ### Current Status
+
 - Backend foundation is stable and standardized.
-- Authentication, profiles, connections, projects, skills, search, and collaboration requests are implemented.
-- API conventions and project documentation have been synchronized with the implementation.
-- Frontend development is the current focus.
+- Authentication, profiles, connections, projects, skills, search, collaboration requests, and project member management are implemented.
+- Core backend APIs are feature-complete for the collaboration workflow.
+- Project collaboration workflow is complete.
+- Frontend development and backend integration are the current focus.
 
 ---
 
 ## Progress
 
 ### Completed:
+
 - **Authentication:** Register, Login, Refresh Tokens, Refresh Token Rotation, Logout, Secure Cookie Authentication, Authentication Middleware.
 - **User Module:** Current Profile, Public Profile by Username, Profile Update, Username Update, Avatar Upload, Default Avatar Generation, Cloudinary Integration.
 - **Connection Module:** Send, Accept, Reject, Cancel, Remove, Incoming, Outgoing, Connection services.
-- **Project Module:** Create, Get, Update, Delete, Search.
+- **Project Module:** Create, Get, Update, Delete, Search, Leave, Remove Member, Complete Project, Automatic status recalculation, Project member management.
 - **Skill Module:** Skill creation, autocomplete search, publicId resolution.
 - **Search Module:** Developer search, Project search, Structured POST search APIs.
-- **Collaboration Request Module:** Apply, Invite, Accept, Reject, Cancel, List applications/invitations (incoming/outgoing), Project members array on accept.
+- **Collaboration Request Module:** Apply, Invite, Accept, Reject, Cancel, Incoming/Outgoing application lists, Incoming/Outgoing invitation lists, Integration with project member management.
 - **Core Architecture:** Controller→Service architecture, standardized service returns, Global ApiError, Global Error Middleware, Express 5 async error handling, Zod validation middleware.
 - **Models:** User, Project, Connection, Skill, CollaborationRequest.
 
 ### In Progress:
+
 - Frontend development and backend integration.
 
+---
+
 ### Planned:
-- Project members management (list/remove).
-- Messaging.
+
 - Notifications.
+- Messaging.
 - Reviews.
 
 ---
 
 ## Architecture Decisions
+
 - Using Express 5 promise-based error handling (no asyncHandler wrappers; rejected promises reach global error middleware).
 - Services throw ApiError for business errors; unexpected errors bubble automatically.
 - Public IDs (not Mongo ObjectIds) are exposed externally.
@@ -70,8 +82,10 @@ Collaboration Requests
 - Project owner is stored separately from `members`; accepted collaboration requests add users to `members` only.
 - Collaboration requests support two types: APPLICATION (developer → owner) and INVITATION (owner → developer).
 - Collaboration request public IDs use the `CRQ_` prefix.
+- Project status is auto-managed via `recalculateProjectStatus` in `project.service.js` (OPEN ↔ IN_PROGRESS based on team size); COMPLETED is set explicitly by the owner when status is IN_PROGRESS.
 
 ### Development Workflow
+
 - Architecture, business rules, APIs, database design, validation rules, authorization, and feature planning are always designed before implementation.
 - AI is used as an implementation accelerator for repetitive backend work after the design is finalized.
 - AI may generate models, controllers, services, routes, validation schemas, CRUD logic, DTOs, and boilerplate tests.
@@ -83,15 +97,16 @@ Collaboration Requests
 ---
 
 ## Next Tasks
-1. Build Project Members workflow (list/remove members).
-2. Connect frontend to backend.
+
+1. Connect frontend to backend.
+2. Implement notifications.
 3. Implement messaging.
-4. Implement notifications.
-5. Implement reviews.
+4. Implement reviews.
 
 ---
 
 ## Known Technical Debt
+
 - No automated integration tests.
 - Frontend is still under active development.
 - Best-match search ranking is currently a placeholder.
@@ -99,6 +114,7 @@ Collaboration Requests
 ---
 
 ## Recently Learned
+
 - Refresh token rotation.
 - Secure cookie authentication.
 - Cloudinary rollback patterns.
@@ -108,10 +124,13 @@ Collaboration Requests
 - Structured search API design.
 - Skill publicId resolution.
 - Collaboration request lifecycle (application vs invitation).
+- Project member lifecycle management and automatic project status transitions.
 
 ---
 
 ## Session Notes
-- Collaboration Requests module implemented with apply, invite, accept, reject, cancel, and list endpoints.
-- Project model updated with embedded `members` array; owner remains separate.
-- Documentation updated to reflect implemented collaboration APIs and database schema.
+
+- Collaboration Request module completed and reviewed.
+- Project Member Management completed and reviewed.
+- Project status is automatically recalculated between OPEN and IN_PROGRESS based on current team size.
+- COMPLETED projects freeze team-management operations while allowing non-team project metadata updates.

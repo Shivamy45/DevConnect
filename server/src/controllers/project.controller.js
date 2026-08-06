@@ -4,6 +4,9 @@ import {
 	getProjectByPublicId,
 	deleteProject,
 	listProjectsBySearch,
+	leaveProject,
+	removeProjectMember,
+	updateProjectStatus,
 } from "../services/project.service.js";
 
 export const getProjectController = async (req, res) => {
@@ -62,6 +65,47 @@ export const searchProjectsController = async (req, res) => {
 		data: {
 			projects: result.projects,
 			pagination: result.pagination,
+		},
+	});
+};
+
+export const leaveProjectController = async (req, res) => {
+	const result = await leaveProject(req.user.id, req.params.publicId);
+	res.status(200).json({
+		success: true,
+		message: "Left project successfully",
+		data: {
+			project: result.project,
+		},
+	});
+};
+
+export const removeProjectMemberController = async (req, res) => {
+	const result = await removeProjectMember(
+		req.user.id,
+		req.params.publicId,
+		req.params.username,
+	);
+	res.status(200).json({
+		success: true,
+		message: "Project member removed successfully",
+		data: {
+			project: result.project,
+		},
+	});
+};
+
+export const updateProjectStatusController = async (req, res) => {
+	const result = await updateProjectStatus(
+		req.user.id,
+		req.params.publicId,
+		req.body.status,
+	);
+	res.status(200).json({
+		success: true,
+		message: "Project status updated successfully",
+		data: {
+			project: result.project,
 		},
 	});
 };

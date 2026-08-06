@@ -3,13 +3,19 @@ import {
 	createProjectController,
 	deleteProjectController,
 	getProjectController,
+	leaveProjectController,
+	removeProjectMemberController,
 	searchProjectsController,
 	updateProjectController,
+	updateProjectStatusController,
 } from "../controllers/project.controller.js";
 import authenticateUser from "../middlewares/auth.middleware.js";
 import validate from "../middlewares/validation.middleware.js";
 import {
+	completeProjectSchema,
 	createProjectSchema,
+	leaveProjectSchema,
+	removeProjectMemberSchema,
 	searchProjectsSchema,
 	updateProjectSchema,
 } from "../validations/project.validation.js";
@@ -28,6 +34,26 @@ router.post(
 	validate(createProjectSchema),
 	createProjectController,
 );
+
+router.patch(
+	"/:publicId/status",
+	authenticateUser,
+	validate(completeProjectSchema),
+	updateProjectStatusController,
+);
+router.delete(
+	"/:publicId/members/me",
+	authenticateUser,
+	validate(leaveProjectSchema),
+	leaveProjectController,
+);
+router.delete(
+	"/:publicId/members/:username",
+	authenticateUser,
+	validate(removeProjectMemberSchema),
+	removeProjectMemberController,
+);
+
 router.get("/:publicId", getProjectController);
 router.patch(
 	"/:publicId",

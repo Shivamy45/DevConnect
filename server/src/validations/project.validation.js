@@ -15,6 +15,18 @@ const statusSchema = z
 	.toUpperCase()
 	.pipe(z.enum(["OPEN", "IN_PROGRESS", "COMPLETED"]));
 
+const projectPublicIdSchema = publicIdValueSchema("PRJ_", "project");
+
+const usernameSchema = z
+	.string()
+	.trim()
+	.regex(
+		/^[a-z0-9_-]+$/,
+		"Username can only contain letters, numbers, _, and -",
+	)
+	.min(3, "Username must be at least 3 characters")
+	.max(20, "Username cannot exceed 20 characters");
+
 const pageSchema = z.coerce.number().int().min(1).default(1);
 const limitSchema = z.coerce.number().int().min(1).max(50).default(10);
 
@@ -37,7 +49,6 @@ export const createProjectSchema = z.object({
 			visibility: visibilitySchema.optional(),
 			requiredSkills: z.array(skillPublicIdSchema).max(10).optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
-			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
 		})
 		.strict(),
@@ -55,11 +66,46 @@ export const updateProjectSchema = z.object({
 			visibility: visibilitySchema.optional(),
 			requiredSkills: z.array(skillPublicIdSchema).max(10).optional(),
 			externalLinks: z.array(externalLinkSchema).optional(),
-			status: statusSchema.optional(),
 			maxMembers: z.number().int().min(1).optional(),
 		})
 		.strict(),
 });
+
+export const leaveProjectSchema = z
+	.object({
+		params: z
+			.object({
+				publicId: projectPublicIdSchema,
+			})
+			.strict(),
+	})
+	.strict();
+
+export const removeProjectMemberSchema = z
+	.object({
+		params: z
+			.object({
+				publicId: projectPublicIdSchema,
+				username: usernameSchema,
+			})
+			.strict(),
+	})
+	.strict();
+
+export const completeProjectSchema = z
+	.object({
+		params: z
+			.object({
+				publicId: projectPublicIdSchema,
+			})
+			.strict(),
+		body: z
+			.object({
+				status: z.literal("COMPLETED"),
+			})
+			.strict(),
+	})
+	.strict();
 
 export const searchProjectsSchema = z
 	.object({

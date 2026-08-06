@@ -21,9 +21,8 @@ DevConnect uses MongoDB as its primary database. Data is organized into collecti
 | Users                  | Store user accounts and profiles                             |
 | Connections            | Store developer connection requests and accepted connections |
 | Skills                 | List available skills                                        |
-| Projects               | Store project information                                    |
-| Collaboration Requests | Manage project join requests                                 |
-| Collaborations         | Track accepted collaborators                                 |
+| Projects               | Store project information and team members                   |
+| Collaboration Requests | Manage project join requests and invitations                 |
 | Conversations          | Chat conversations                                           |
 | Messages               | Conversation messages                                        |
 | Reviews                | Collaboration feedback                                       |
@@ -41,7 +40,6 @@ User
  ├── Connections
  ├── Projects
  ├── Collaboration Requests
- ├── Collaborations
  ├── Conversations
  ├── Reviews
  └── Notifications
@@ -49,8 +47,8 @@ User
 Project
  │
  ├── Required Skills
+ ├── Members
  ├── Collaboration Requests
- ├── Collaborations
  └── Conversation
 
 Conversation
@@ -115,50 +113,42 @@ Conversation
 
 ### Projects
 
-| Field          | Type       | Notes                  |
-| -------------- | ---------- | ---------------------- |
-| publicId       | String     | Unique, Required       |
-| owner          | ObjectId   | Ref, Required          |
-| title          | String     | Required               |
-| description    | String     | Required               |
-| requiredSkills | ObjectId[] | Ref(Skill)[], Optional |
-| maxMembers     | Number     | Required               |
-| members        | Array<{ userId: ObjectId, joinedAt: Date }> | Ref(User)[], Optional; owner is stored separately |
-| visibility     | String     | Enum, Required         |
-| tags           | String[]   | Optional               |
-| status         | String     | Enum, Required         |
-| createdAt      | Date       | Auto                   |
-| updatedAt      | Date       | Auto                   |
+| Field          | Type                                        | Notes                                                              |
+| -------------- | ------------------------------------------- | ------------------------------------------------------------------ | --- |
+| publicId       | String                                      | Unique, Required                                                   |
+| owner          | ObjectId                                    | Ref(User), Required                                                |     |
+| title          | String                                      | Required                                                           |
+| description    | String                                      | Required                                                           |
+| requiredSkills | ObjectId[]                                  | Array of Ref(Skill), Optional                                      |
+| maxMembers     | Number                                      | Required                                                           |
+| members        | Array<{ userId: ObjectId, joinedAt: Date }> | Array of Ref(User); owner is stored separately                     |
+| visibility     | String                                      | Enum, Required                                                     |
+| tags           | String[]                                    | Optional                                                           |
+| status         | String                                      | Enum: OPEN, IN_PROGRESS, COMPLETED; auto-managed except completion |
+| createdAt      | Date                                        | Auto                                                               |
+| updatedAt      | Date                                        | Auto                                                               |
 
 ### Collaboration Requests
 
-| Field      | Type     | Notes                              |
-| ---------- | -------- | ---------------------------------- |
-| publicId   | String   | Unique, Required                   |
-| projectId  | ObjectId | Ref(Project), Required             |
-| senderId   | ObjectId | Ref(User), Required                |
-| receiverId | ObjectId | Ref(User), Required                |
-| type       | String   | Enum: APPLICATION, INVITATION      |
+| Field      | Type     | Notes                                        |
+| ---------- | -------- | -------------------------------------------- |
+| publicId   | String   | Unique, Required                             |
+| projectId  | ObjectId | Ref(Project), Required                       |
+| senderId   | ObjectId | Ref(User), Required                          |
+| receiverId | ObjectId | Ref(User), Required                          |
+| type       | String   | Enum: APPLICATION, INVITATION                |
 | status     | String   | Enum: PENDING, ACCEPTED, REJECTED, CANCELLED |
-| message    | String   | Optional, max 500 characters       |
-| createdAt  | Date     | Auto                               |
-| updatedAt  | Date     | Auto                               |
-
-### Collaborations
-
-| Field   | Type     | Notes          |
-| ------- | -------- | -------------- |
-| project | ObjectId | Ref, Required  |
-| user    | ObjectId | Ref, Required  |
-| role    | String   | Enum, Required |
+| message    | String   | Optional, max 500 characters                 |
+| createdAt  | Date     | Auto                                         |
+| updatedAt  | Date     | Auto                                         |
 
 ### Conversations
 
-| Field        | Type                | Notes            |
-| ------------ | ------------------- | ---------------- |
-| publicId     | String              | Unique, Required |
-| participants | ObjectId[]          | Ref[], Required  |
-| project      | ObjectId (optional) | Ref, Optional    |
+| Field        | Type       | Notes                  |
+| ------------ | ---------- | ---------------------- |
+| publicId     | String     | Unique, Required       |
+| participants | ObjectId[] | Ref[], Required        |
+| project      | ObjectId   | Ref(Project), Optional |
 
 ### Messages
 
@@ -198,18 +188,17 @@ Conversation
 
 # 5. Indexes
 
-| Collection             | Indexed Fields                                  |
-| ---------------------- | ----------------------------------------------- |
-| Users                  | username, email, publicId                       |
-| Connections            | sender + receiver (compound unique), status     |
-| Skills                 | publicId, name                                  |
-| Projects               | owner, status, title (text), description (text), members.userId |
-| Collaboration Requests | projectId, senderId, receiverId, type, status, publicId         |
-| Collaborations         | project + user (unique), user                   |
-| Conversations          | participants                                    |
-| Notifications          | recipient, isRead, createdAt                    |
-| Sessions               | user, expiresAt                                 |
-| Reviews                | reviewer + reviewee + project (unique)          |
+| Collection             | Indexed Fields                                          |
+| ---------------------- | ------------------------------------------------------- |
+| Users                  | username, email, publicId                               |
+| Connections            | sender + receiver (compound unique), status             |
+| Skills                 | publicId, name                                          |
+| Projects               | owner, status, title (text), description (text)         |
+| Collaboration Requests | projectId, senderId, receiverId, type, status, publicId |
+| Conversations          | participants                                            |
+| Notifications          | recipient, isRead, createdAt                            |
+| Sessions               | user, expiresAt                                         |
+| Reviews                | reviewer + reviewee + project (unique)                  |
 
 ---
 
@@ -221,7 +210,7 @@ Conversation
 | Projects   | title, description |
 | Skills     | name               |
 
-Developer and project searches use structured POST request bodies. Skill filtering is performed using referenced Skill ObjectIds after resolving client-facing Skill publicIds in the service layer.
+Developer and project searches use structured POST request bodies. Skill publicIds are resolved to MongoDB ObjectIds in the service layer before querying.
 
 ---
 
@@ -242,11 +231,13 @@ Developer and project searches use structured POST request bodies. Skill filteri
 # 8. Enumerations
 
 - **Connection.status**: Pending, Accepted, Rejected, Cancelled
-- **Project.status**: Draft, Open, In Progress, Completed, Archived
+- **Project.status**: OPEN, IN_PROGRESS, COMPLETED
+    - OPEN: accepting collaboration requests and invitations
+    - IN_PROGRESS: team is full; no new collaboration requests or invitations
+    - COMPLETED: finished; no team management allowed
 - **Project.visibility**: Public, Private
 - **CollaborationRequest.type**: APPLICATION, INVITATION
 - **CollaborationRequest.status**: PENDING, ACCEPTED, REJECTED, CANCELLED
-- **Collaboration.role**: Owner, Maintainer, Contributor
 - **Notification.type**: CollaborationRequest, RequestAccepted, RequestRejected, Message, Review
 - **ExperienceLevel**: Beginner, Intermediate, Advanced
 - **Skill.level**: Beginner, Intermediate, Advanced
@@ -263,8 +254,8 @@ Users
  │
  ├────< Projects
  │          │
+ │          ├── members[]
  │          ├────< Collaboration Requests
- │          ├────< Collaborations
  │          └──── Conversation ────< Messages
  │
  ├────< Reviews
