@@ -123,6 +123,7 @@ Conversation
 | description    | String     | Required               |
 | requiredSkills | ObjectId[] | Ref(Skill)[], Optional |
 | maxMembers     | Number     | Required               |
+| members        | Array<{ userId: ObjectId, joinedAt: Date }> | Ref(User)[], Optional; owner is stored separately |
 | visibility     | String     | Enum, Required         |
 | tags           | String[]   | Optional               |
 | status         | String     | Enum, Required         |
@@ -131,12 +132,17 @@ Conversation
 
 ### Collaboration Requests
 
-| Field    | Type     | Notes            |
-| -------- | -------- | ---------------- |
-| publicId | String   | Unique, Required |
-| sender   | ObjectId | Ref, Required    |
-| project  | ObjectId | Ref, Required    |
-| status   | String   | Enum, Required   |
+| Field      | Type     | Notes                              |
+| ---------- | -------- | ---------------------------------- |
+| publicId   | String   | Unique, Required                   |
+| projectId  | ObjectId | Ref(Project), Required             |
+| senderId   | ObjectId | Ref(User), Required                |
+| receiverId | ObjectId | Ref(User), Required                |
+| type       | String   | Enum: APPLICATION, INVITATION      |
+| status     | String   | Enum: PENDING, ACCEPTED, REJECTED, CANCELLED |
+| message    | String   | Optional, max 500 characters       |
+| createdAt  | Date     | Auto                               |
+| updatedAt  | Date     | Auto                               |
 
 ### Collaborations
 
@@ -197,8 +203,8 @@ Conversation
 | Users                  | username, email, publicId                       |
 | Connections            | sender + receiver (compound unique), status     |
 | Skills                 | publicId, name                                  |
-| Projects               | owner, status, title (text), description (text) |
-| Collaboration Requests | project, sender (unique while pending), status  |
+| Projects               | owner, status, title (text), description (text), members.userId |
+| Collaboration Requests | projectId, senderId, receiverId, type, status, publicId         |
 | Collaborations         | project + user (unique), user                   |
 | Conversations          | participants                                    |
 | Notifications          | recipient, isRead, createdAt                    |
@@ -238,7 +244,8 @@ Developer and project searches use structured POST request bodies. Skill filteri
 - **Connection.status**: Pending, Accepted, Rejected, Cancelled
 - **Project.status**: Draft, Open, In Progress, Completed, Archived
 - **Project.visibility**: Public, Private
-- **CollaborationRequest.status**: Pending, Accepted, Rejected, Withdrawn
+- **CollaborationRequest.type**: APPLICATION, INVITATION
+- **CollaborationRequest.status**: PENDING, ACCEPTED, REJECTED, CANCELLED
 - **Collaboration.role**: Owner, Maintainer, Contributor
 - **Notification.type**: CollaborationRequest, RequestAccepted, RequestRejected, Message, Review
 - **ExperienceLevel**: Beginner, Intermediate, Advanced

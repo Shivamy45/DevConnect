@@ -67,7 +67,7 @@ Create a platform where developers can build professional networks, discover mea
 | User Profiles                   | MVP    |
 | Developer Connections           | MVP    |
 | Projects                       | MVP    |
-| Collaboration Requests          | MVP    |
+| Collaboration Requests          | Implemented |
 | Messaging                      | MVP    |
 | Reviews                        | MVP    |
 | Notifications                  | MVP    |

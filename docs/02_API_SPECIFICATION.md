@@ -168,14 +168,17 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 
 ## Collaboration
 
-| Method | Endpoint                       | Auth | Description                    | Notes                           |
-| ------ | ------------------------------ | ---- | ------------------------------ | ------------------------------- |
-| POST   | `/projects/:publicId/requests` | Yes  | Send collaboration request     | Authenticated user              |
-| GET    | `/projects/:publicId/requests` | Yes  | List collaboration requests    | Project owner only              |
-| GET    | `/users/me/requests`           | Yes  | List my collaboration requests | Authenticated user              |
-| PATCH  | `/requests/:publicId/accept`   | Yes  | Accept request                 | Project owner only              |
-| PATCH  | `/requests/:publicId/reject`   | Yes  | Reject request                 | Project owner only              |
-| DELETE | `/requests/:publicId`          | Yes  | Cancel or remove request       | Request sender or project owner |
+| Method | Endpoint                                              | Auth | Description                          | Notes                              |
+| ------ | ----------------------------------------------------- | ---- | ------------------------------------ | ---------------------------------- |
+| POST   | `/collaboration-requests/apply`                       | Yes  | Apply to join a project              | Authenticated developer            |
+| POST   | `/collaboration-requests/invite`                      | Yes  | Invite a developer to a project      | Project owner only                 |
+| GET    | `/collaboration-requests/applications/outgoing`       | Yes  | List my outgoing applications        | Authenticated developer            |
+| GET    | `/collaboration-requests/applications/incoming`       | Yes  | List incoming applications           | Project owner only                 |
+| GET    | `/collaboration-requests/invitations/incoming`        | Yes  | List incoming invitations            | Authenticated developer            |
+| GET    | `/collaboration-requests/invitations/outgoing`        | Yes  | List outgoing invitations            | Project owner only                 |
+| PATCH  | `/collaboration-requests/:publicId/accept`            | Yes  | Accept a collaboration request       | Request receiver only              |
+| PATCH  | `/collaboration-requests/:publicId/reject`            | Yes  | Reject a collaboration request       | Request receiver only              |
+| PATCH  | `/collaboration-requests/:publicId/cancel`            | Yes  | Cancel a pending request             | Applicant (application) or owner (invitation) |
 
 ## Conversations
 
@@ -231,7 +234,9 @@ The DevConnect backend exposes a REST API that enables user authentication, deve
 | Project Delete            | Owner                |
 | Collaboration Request     | Authenticated User   |
 | Sessions                  | Authenticated User   |
-| Accept / Reject Request   | Project Owner        |
+| Accept / Reject Request   | Request Receiver     |
+| Cancel Application        | Applicant            |
+| Cancel Invitation         | Project Owner        |
 | Messaging                 | Project Members      |
 | Reviews                   | Collaborators        |
 

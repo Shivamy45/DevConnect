@@ -1,6 +1,6 @@
 # DevConnect Progress
 
-Last Updated: 2026-08-02
+Last Updated: 2026-08-07
 
 ---
 
@@ -22,11 +22,11 @@ At the end of every conversation:
 3. Update the "Next Tasks" section.
 
 ### Current Feature
-Developer & Project Discovery
+Collaboration Requests
 
 ### Current Status
 - Backend foundation is stable and standardized.
-- Authentication, profiles, connections, projects, skills and search are implemented.
+- Authentication, profiles, connections, projects, skills, search, and collaboration requests are implemented.
 - API conventions and project documentation have been synchronized with the implementation.
 - Frontend development is the current focus.
 
@@ -41,15 +41,15 @@ Developer & Project Discovery
 - **Project Module:** Create, Get, Update, Delete, Search.
 - **Skill Module:** Skill creation, autocomplete search, publicId resolution.
 - **Search Module:** Developer search, Project search, Structured POST search APIs.
+- **Collaboration Request Module:** Apply, Invite, Accept, Reject, Cancel, List applications/invitations (incoming/outgoing), Project members array on accept.
 - **Core Architecture:** Controller→Service architecture, standardized service returns, Global ApiError, Global Error Middleware, Express 5 async error handling, Zod validation middleware.
-- **Models:** User, Project, Connection, Skill.
+- **Models:** User, Project, Connection, Skill, CollaborationRequest.
 
 ### In Progress:
 - Frontend development and backend integration.
 
 ### Planned:
-- Collaboration requests.
-- Project members.
+- Project members management (list/remove).
 - Messaging.
 - Notifications.
 - Reviews.
@@ -67,6 +67,9 @@ Developer & Project Discovery
 - Complex search endpoints use POST with structured request bodies.
 - Skill publicIds are resolved to MongoDB ObjectIds in the service layer.
 - Skill creation is explicit through the Skill module; User and Project modules only reference existing skills.
+- Project owner is stored separately from `members`; accepted collaboration requests add users to `members` only.
+- Collaboration requests support two types: APPLICATION (developer → owner) and INVITATION (owner → developer).
+- Collaboration request public IDs use the `CRQ_` prefix.
 
 ### Development Workflow
 - Architecture, business rules, APIs, database design, validation rules, authorization, and feature planning are always designed before implementation.
@@ -80,12 +83,11 @@ Developer & Project Discovery
 ---
 
 ## Next Tasks
-1. Design and implement Collaboration Requests.
-2. Build Project Members workflow.
-3. Connect frontend to backend.
-4. Implement messaging.
-5. Implement notifications.
-6. Implement reviews.
+1. Build Project Members workflow (list/remove members).
+2. Connect frontend to backend.
+3. Implement messaging.
+4. Implement notifications.
+5. Implement reviews.
 
 ---
 
@@ -105,10 +107,11 @@ Developer & Project Discovery
 - Service standardization.
 - Structured search API design.
 - Skill publicId resolution.
+- Collaboration request lifecycle (application vs invitation).
 
 ---
 
 ## Session Notes
-- Backend APIs for discovery are complete.
-- Project documentation has been updated to match the implementation.
-- Next milestone: Collaboration Requests.
+- Collaboration Requests module implemented with apply, invite, accept, reject, cancel, and list endpoints.
+- Project model updated with embedded `members` array; owner remains separate.
+- Documentation updated to reflect implemented collaboration APIs and database schema.

@@ -6,7 +6,6 @@ const projectSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 			unique: true,
-			index: true,
 		},
 		title: {
 			type: String,
@@ -66,6 +65,19 @@ const projectSchema = new mongoose.Schema(
 			default: 5,
 			min: 1,
 		},
+		members: [
+			{
+				userId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
+				},
+				joinedAt: {
+					type: Date,
+					default: Date.now,
+				},
+			},
+		],
 	},
 	{ timestamps: true },
 );
